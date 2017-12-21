@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="buff_utils">
+      <UniqueIdentifier>{FE6C02C4-1D37-8EE7-0598-E1C7AF69D65B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="buff_utils">
+      <UniqueIdentifier>{FE6C02C4-1D37-8EE7-0598-E1C7AF69D65B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="buff_utils">
+      <UniqueIdentifier>{FE6C02C4-1D37-8EE7-0598-E1C7AF69D65B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="buff_utils">
+      <UniqueIdentifier>{FE6C02C4-1D37-8EE7-0598-E1C7AF69D65B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="checksum_utils">
+      <UniqueIdentifier>{1CBE23A5-3E15-87B5-6264-0B8981BF9246}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="checksum_utils">
+      <UniqueIdentifier>{1CBE23A5-3E15-87B5-6264-0B8981BF9246}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kiss_fft">
+      <UniqueIdentifier>{F9DE1495-3662-FEFB-6DFD-A963D3D09EB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kiss_fft">
+      <UniqueIdentifier>{F9DE1495-3662-FEFB-6DFD-A963D3D09EB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kiss_fft">
+      <UniqueIdentifier>{F9DE1495-3662-FEFB-6DFD-A963D3D09EB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kiss_fft">
+      <UniqueIdentifier>{F9DE1495-3662-FEFB-6DFD-A963D3D09EB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kiss_fft">
+      <UniqueIdentifier>{F9DE1495-3662-FEFB-6DFD-A963D3D09EB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kiss_fft">
+      <UniqueIdentifier>{F9DE1495-3662-FEFB-6DFD-A963D3D09EB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kiss_fft">
+      <UniqueIdentifier>{F9DE1495-3662-FEFB-6DFD-A963D3D09EB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="log_utils">
+      <UniqueIdentifier>{8D0953D7-3403-395A-D3F7-346F5FFE821A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="proto_utils">
+      <UniqueIdentifier>{075C9E62-E558-0F91-AAE9-866E9FA86B55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="proto_utils">
+      <UniqueIdentifier>{075C9E62-E558-0F91-AAE9-866E9FA86B55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="proto_utils">
+      <UniqueIdentifier>{075C9E62-E558-0F91-AAE9-866E9FA86B55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="proto_utils">
+      <UniqueIdentifier>{075C9E62-E558-0F91-AAE9-866E9FA86B55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="proto_utils">
+      <UniqueIdentifier>{075C9E62-E558-0F91-AAE9-866E9FA86B55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver">
+      <UniqueIdentifier>{D7F6F393-3EF5-71F9-41A5-4A2FD8E2B832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver\recv">
+      <UniqueIdentifier>{615DF6F3-30B4-FE9E-B16E-45B09E062503}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver">
+      <UniqueIdentifier>{D7F6F393-3EF5-71F9-41A5-4A2FD8E2B832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver\recv">
+      <UniqueIdentifier>{615DF6F3-30B4-FE9E-B16E-45B09E062503}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver">
+      <UniqueIdentifier>{D7F6F393-3EF5-71F9-41A5-4A2FD8E2B832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver\recv">
+      <UniqueIdentifier>{615DF6F3-30B4-FE9E-B16E-45B09E062503}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver">
+      <UniqueIdentifier>{D7F6F393-3EF5-71F9-41A5-4A2FD8E2B832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver\recv">
+      <UniqueIdentifier>{615DF6F3-30B4-FE9E-B16E-45B09E062503}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver">
+      <UniqueIdentifier>{D7F6F393-3EF5-71F9-41A5-4A2FD8E2B832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver\send">
+      <UniqueIdentifier>{B922A4DE-0170-7BD0-2C2A-72A1A3830F2B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver">
+      <UniqueIdentifier>{D7F6F393-3EF5-71F9-41A5-4A2FD8E2B832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver\send">
+      <UniqueIdentifier>{B922A4DE-0170-7BD0-2C2A-72A1A3830F2B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver">
+      <UniqueIdentifier>{D7F6F393-3EF5-71F9-41A5-4A2FD8E2B832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver\send">
+      <UniqueIdentifier>{B922A4DE-0170-7BD0-2C2A-72A1A3830F2B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver">
+      <UniqueIdentifier>{D7F6F393-3EF5-71F9-41A5-4A2FD8E2B832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transceiver\send">
+      <UniqueIdentifier>{B922A4DE-0170-7BD0-2C2A-72A1A3830F2B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="interface">
+      <UniqueIdentifier>{D45E0FBD-84A7-45CA-36AC-7A06BD0C9BF7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="interface">
+      <UniqueIdentifier>{D45E0FBD-84A7-45CA-36AC-7A06BD0C9BF7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="interface">
+      <UniqueIdentifier>{D45E0FBD-84A7-45CA-36AC-7A06BD0C9BF7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="interface">
+      <UniqueIdentifier>{D45E0FBD-84A7-45CA-36AC-7A06BD0C9BF7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="buff_utils\queue.c">
+      <Filter>buff_utils</Filter>
+    </ClCompile>
+    <ClInclude Include="buff_utils\queue.h">
+      <Filter>buff_utils</Filter>
+    </ClInclude>
+    <ClCompile Include="buff_utils\ring_buff.c">
+      <Filter>buff_utils</Filter>
+    </ClCompile>
+    <ClInclude Include="buff_utils\ring_buff.h">
+      <Filter>buff_utils</Filter>
+    </ClInclude>
+    <ClCompile Include="checksum_utils\crc_codec.c">
+      <Filter>checksum_utils</Filter>
+    </ClCompile>
+    <ClInclude Include="checksum_utils\crc_codec.h">
+      <Filter>checksum_utils</Filter>
+    </ClInclude>
+    <ClInclude Include="kiss_fft\_kiss_fft_guts.h">
+      <Filter>kiss_fft</Filter>
+    </ClInclude>
+    <ClCompile Include="kiss_fft\kiss_fastfir.c">
+      <Filter>kiss_fft</Filter>
+    </ClCompile>
+    <ClInclude Include="kiss_fft\kiss_fastfir.h">
+      <Filter>kiss_fft</Filter>
+    </ClInclude>
+    <ClCompile Include="kiss_fft\kiss_fft.c">
+      <Filter>kiss_fft</Filter>
+    </ClCompile>
+    <ClInclude Include="kiss_fft\kiss_fft.h">
+      <Filter>kiss_fft</Filter>
+    </ClInclude>
+    <ClCompile Include="kiss_fft\kiss_fftr.c">
+      <Filter>kiss_fft</Filter>
+    </ClCompile>
+    <ClInclude Include="kiss_fft\kiss_fftr.h">
+      <Filter>kiss_fft</Filter>
+    </ClInclude>
+    <ClInclude Include="log_utils\wt_log.h">
+      <Filter>log_utils</Filter>
+    </ClInclude>
+    <ClInclude Include="proto_utils\wt_proto_common.h">
+      <Filter>proto_utils</Filter>
+    </ClInclude>
+    <ClCompile Include="proto_utils\wt_proto_link_layer.c">
+      <Filter>proto_utils</Filter>
+    </ClCompile>
+    <ClInclude Include="proto_utils\wt_proto_link_layer.h">
+      <Filter>proto_utils</Filter>
+    </ClInclude>
+    <ClCompile Include="proto_utils\wt_proto_physical_layer.c">
+      <Filter>proto_utils</Filter>
+    </ClCompile>
+    <ClInclude Include="proto_utils\wt_proto_physical_layer.h">
+      <Filter>proto_utils</Filter>
+    </ClInclude>
+    <ClCompile Include="transceiver\recv\wt_recv_link_layer.c">
+      <Filter>transceiver\recv</Filter>
+    </ClCompile>
+    <ClInclude Include="transceiver\recv\wt_recv_link_layer.h">
+      <Filter>transceiver\recv</Filter>
+    </ClInclude>
+    <ClCompile Include="transceiver\recv\wt_recv_physical_layer.c">
+      <Filter>transceiver\recv</Filter>
+    </ClCompile>
+    <ClInclude Include="transceiver\recv\wt_recv_physical_layer.h">
+      <Filter>transceiver\recv</Filter>
+    </ClInclude>
+    <ClCompile Include="transceiver\send\wt_send_link_layer.c">
+      <Filter>transceiver\send</Filter>
+    </ClCompile>
+    <ClInclude Include="transceiver\send\wt_send_link_layer.h">
+      <Filter>transceiver\send</Filter>
+    </ClInclude>
+    <ClCompile Include="transceiver\send\wt_send_physical_layer.c">
+      <Filter>transceiver\send</Filter>
+    </ClCompile>
+    <ClInclude Include="transceiver\send\wt_send_physical_layer.h">
+      <Filter>transceiver\send</Filter>
+    </ClInclude>
+    <ClCompile Include="interface\wave_trans_recv.c">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClInclude Include="interface\wave_trans_recv.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClCompile Include="interface\wave_trans_send.c">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClInclude Include="interface\wave_trans_send.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <None Include="wave_trans.gyp"/>
+  </ItemGroup>
+</Project>

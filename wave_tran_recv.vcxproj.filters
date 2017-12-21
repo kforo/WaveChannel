@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="demo">
+      <UniqueIdentifier>{C1E47CDE-FE1C-1F95-A17C-4D92B7E55693}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="demo\recv_test.c">
+      <Filter>demo</Filter>
+    </ClCompile>
+    <None Include="wave_trans.gyp"/>
+  </ItemGroup>
+</Project>
