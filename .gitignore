@@ -4,5 +4,10 @@
 *.VC.db
 *.VC.VC.opendb
 *.sln
+*.swp
+Makefile
+*.mk
+*.Makefile
 /Default/
 /.vs/
+/out/
