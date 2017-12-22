@@ -13,11 +13,11 @@ static int GetPcmMaxAmplitudeFreq(const RecvAudioType *pcm_buf, int len, int thr
   kiss_fft_cpx *out_data = NULL;
   kiss_fft_cfg fft_cfg = NULL;
   in_data = (kiss_fft_cpx *)malloc(sizeof(kiss_fft_cpx)*len);
-  if (IF_UNLIKELY(in_data == NULL)) {
+  if (in_data == NULL) {
     goto error_exit;
   }
   out_data = (kiss_fft_cpx *)malloc(sizeof(kiss_fft_cpx)*len);
-  if (IF_UNLIKELY(out_data == NULL)) {
+  if (out_data == NULL) {
     goto error_exit;
   }
   int i;
@@ -140,10 +140,10 @@ int WTPhysicalPcmToFreqMark(const RecvAudioType * pcm_buf, int pcm_len, WTPhyFre
   int threshold = 50;
   int freq;
   freq = GetPcmMaxAmplitudeFreq(pcm_buf, pcm_len, threshold);
-  if (IF_LIKELY(freq == -1)) {
+  if (freq == -1) {
     return -1;
   }
-  if (IF_LIKELY(FreqToFreqMark(freq, freq_mark) != 0)) {
+  if (FreqToFreqMark(freq, freq_mark) != 0) {
     return -1;
   }
   return 0;

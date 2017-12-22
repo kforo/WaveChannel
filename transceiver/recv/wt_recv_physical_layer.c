@@ -72,8 +72,8 @@ void WTRecvPhyLayerSendPcm(const RecvAudioType * pcm, int pcm_len)
   int pcm_r_addr = 0;
   WTPhyFreqMarkType mark;
   
-  if (IF_LIKELY(pcm_buf_w_addr_ != 0)) {
-    if (IF_UNLIKELY(pcm_len < FREQ_ANA_BUF_SIZE - pcm_buf_w_addr_)) {
+  if (pcm_buf_w_addr_ != 0) {
+    if (pcm_len < FREQ_ANA_BUF_SIZE - pcm_buf_w_addr_) {
       memcpy(&pcm_buf_[pcm_buf_w_addr_], pcm, sizeof(RecvAudioType)*pcm_len);
       pcm_buf_w_addr_ += pcm_len;
       return;
@@ -81,12 +81,12 @@ void WTRecvPhyLayerSendPcm(const RecvAudioType * pcm, int pcm_len)
     memcpy(&pcm_buf_[pcm_buf_w_addr_], pcm, sizeof(RecvAudioType)*(FREQ_ANA_BUF_SIZE - pcm_buf_w_addr_));
     pcm_r_addr += FREQ_ANA_BUF_SIZE - pcm_buf_w_addr_;
     pcm_buf_w_addr_ = 0;
-    if (IF_UNLIKELY(WTPhysicalPcmToFreqMark(pcm_buf_, FREQ_ANA_BUF_SIZE, &mark) != 0)) {
+    if (WTPhysicalPcmToFreqMark(pcm_buf_, FREQ_ANA_BUF_SIZE, &mark) != 0) {
       RingBuffWriteData(ring_buff_fd_, &mark, sizeof(WTPhyFreqMarkType));
     }
   }
   while (pcm_len - pcm_r_addr >= FREQ_ANA_BUF_SIZE) {
-    if (IF_LIKELY(WTPhysicalPcmToFreqMark(pcm + pcm_r_addr, FREQ_ANA_BUF_SIZE, &mark) != 0)) {
+    if (WTPhysicalPcmToFreqMark(pcm + pcm_r_addr, FREQ_ANA_BUF_SIZE, &mark) != 0) {
       pcm_r_addr += FREQ_ANA_BUF_SIZE;
       continue;
     }
@@ -94,7 +94,7 @@ void WTRecvPhyLayerSendPcm(const RecvAudioType * pcm, int pcm_len)
     RingBuffWriteData(ring_buff_fd_, &mark, sizeof(WTPhyFreqMarkType));
   }
 
-  if(IF_LIKELY(pcm_r_addr<pcm_len)){
+  if(pcm_r_addr<pcm_len){
     memcpy(pcm_buf_, pcm + pcm_r_addr, sizeof(RecvAudioType)*(pcm_len - pcm_r_addr));
     pcm_buf_w_addr_ = pcm_len - pcm_r_addr;
   }
