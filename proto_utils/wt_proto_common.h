@@ -9,13 +9,20 @@
 #define HBYTE_CHECKSUM_NUM              (4)
 #define START_FREQ_MARK                  {16,17}
 #define NONE_MAEK                        (17)
-#define ONE_FREQ_TIME_MS                 (21)
+#define ONE_FREQ_TIME_MS                 (24)
 #define time_ms_to_length(time_ms,sample_rate)          ((time_ms*sample_rate)/1000)
+#ifndef WIN32
+#define IF_LIKELY(x)            likely(x)
+#define IF_UNLIKELY(x)          unlikely(x)
+#else
+#define IF_LIKELY(x)            (x)
+#define IF_UNLIKELY(x)          (x)
+#endif
 
 /*recv side config*/
 #define RECV_SAMPLE_BIT                         (16)
 #define RECV_SAMPLE_RATE                        (16000)
-#define FREQ_ANALYZE_SAMPLE_TIME_MS             (7)
+#define FREQ_ANALYZE_SAMPLE_TIME_MS             (8)
 #if (RECV_SAMPLE_BIT==8)
 typedef char    RecvAudioType;
 #endif

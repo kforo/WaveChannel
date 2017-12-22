@@ -13,17 +13,16 @@ static int GetPcmMaxAmplitudeFreq(const RecvAudioType *pcm_buf, int len, int thr
   kiss_fft_cpx *out_data = NULL;
   kiss_fft_cfg fft_cfg = NULL;
   in_data = (kiss_fft_cpx *)malloc(sizeof(kiss_fft_cpx)*len);
-  if (in_data == NULL) {
+  if (IF_UNLIKELY(in_data == NULL)) {
     goto error_exit;
   }
   out_data = (kiss_fft_cpx *)malloc(sizeof(kiss_fft_cpx)*len);
-  if (out_data == NULL) {
+  if (IF_UNLIKELY(out_data == NULL)) {
     goto error_exit;
   }
   int i;
   for (i = 0; i < len; i++) {
-    //printf("%d\n", pcm_buf[i]);
-    in_data[i].r = (double)pcm_buf[i];
+    in_data[i].r = (float)pcm_buf[i];
     in_data[i].i = 0;
   }
   //printf("################################################\n");
@@ -67,18 +66,18 @@ error_exit:
   return -1;
 }
 
-static int CheckFreqAsList(int fft_freq, int *format_freq)
+static int FreqToFreqMark(int fft_freq, WTPhyFreqMarkType *mark)
 {
   int max_freq_mistake = MAX_FREQ_MISTAKE;
   if (fft_freq<format_freq_list_[0] - max_freq_mistake || fft_freq > format_freq_list_[FREQ_LIST_LEN - 1] + max_freq_mistake) {
     return -1;
   }
   if (fft_freq < format_freq_list_[0]) {
-    *format_freq = format_freq_list_[0];
+    *mark = 0;
     return 0;
   }
   if (fft_freq > format_freq_list_[FREQ_LIST_LEN - 1]) {
-    *format_freq = format_freq_list_[FREQ_LIST_LEN - 1];
+    *mark = FREQ_LIST_LEN - 1;
     return 0;
   }
   int left = 0;
@@ -98,25 +97,12 @@ static int CheckFreqAsList(int fft_freq, int *format_freq)
     return -1;
   }
   if (left_inval < right_inval) {
-    *format_freq = format_freq_list_[left];
+    *mark = left;
   }
   else {
-    *format_freq = format_freq_list_[right];
+    *mark = right;
   }
   return 0;
-
-}
-
-static int FormatFreqToMark(int freq, WTPhyFreqMarkType *mark)
-{
-  int i;
-  for (i = 0; i < FREQ_LIST_LEN; i++) {
-    if (freq == format_freq_list_[i]) {
-      *mark = (unsigned char)i;
-      return 0;
-    }
-  }
-  return -1;
 }
 
 static int FreqMarkToFreq(WTPhyFreqMarkType freq_mark, int *freq)
@@ -152,15 +138,12 @@ static int EncodeSound(int freq, SendAudioType *buffer, int buffer_length)
 int WTPhysicalPcmToFreqMark(const RecvAudioType * pcm_buf, int pcm_len, WTPhyFreqMarkType * freq_mark)
 {
   int threshold = 50;
-  int freq, freq_format;
+  int freq;
   freq = GetPcmMaxAmplitudeFreq(pcm_buf, pcm_len, threshold);
-  if (freq == -1) {
+  if (IF_LIKELY(freq == -1)) {
     return -1;
   }
-  if (CheckFreqAsList(freq, &freq_format) != 0) {
-    return -1;
-  }
-  if (FormatFreqToMark(freq_format, freq_mark) != 0) {
+  if (IF_LIKELY(FreqToFreqMark(freq, freq_mark) != 0)) {
     return -1;
   }
   return 0;

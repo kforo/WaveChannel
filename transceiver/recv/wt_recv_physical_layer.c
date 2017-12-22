@@ -5,6 +5,7 @@
 #include <string.h>
 #define FREQ_ANA_BUF_SIZE               time_ms_to_length(FREQ_ANALYZE_SAMPLE_TIME_MS,SEND_SAMPLE_RATE)
 
+
 typedef struct {
   WTPhyFreqMarkType   phy_mark_;
   int                     mark_num_;
@@ -70,27 +71,32 @@ void WTRecvPhyLayerSendPcm(const RecvAudioType * pcm, int pcm_len)
 {
   int pcm_r_addr = 0;
   WTPhyFreqMarkType mark;
-  while (pcm_r_addr != pcm_len) {
-    if (pcm_buf_w_addr_ == FREQ_ANA_BUF_SIZE) {
-      if (WTPhysicalPcmToFreqMark(pcm_buf_, FREQ_ANA_BUF_SIZE, &mark) != 0) {
-        pcm_buf_w_addr_ = 0;
-        continue;
-      }
-      pcm_buf_w_addr_ = 0;
+  
+  if (IF_LIKELY(pcm_buf_w_addr_ != 0)) {
+    if (IF_UNLIKELY(pcm_len < FREQ_ANA_BUF_SIZE - pcm_buf_w_addr_)) {
+      memcpy(&pcm_buf_[pcm_buf_w_addr_], pcm, sizeof(RecvAudioType)*pcm_len);
+      pcm_buf_w_addr_ += pcm_len;
+      return;
+    }
+    memcpy(&pcm_buf_[pcm_buf_w_addr_], pcm, sizeof(RecvAudioType)*(FREQ_ANA_BUF_SIZE - pcm_buf_w_addr_));
+    pcm_r_addr += FREQ_ANA_BUF_SIZE - pcm_buf_w_addr_;
+    pcm_buf_w_addr_ = 0;
+    if (IF_UNLIKELY(WTPhysicalPcmToFreqMark(pcm_buf_, FREQ_ANA_BUF_SIZE, &mark) != 0)) {
       RingBuffWriteData(ring_buff_fd_, &mark, sizeof(WTPhyFreqMarkType));
     }
-    else {
-      if (pcm_len - pcm_r_addr > FREQ_ANA_BUF_SIZE - pcm_buf_w_addr_) {
-        memcpy(pcm_buf_ + pcm_buf_w_addr_, pcm + pcm_r_addr, sizeof(RecvAudioType)*(FREQ_ANA_BUF_SIZE - pcm_buf_w_addr_));
-        pcm_r_addr += FREQ_ANA_BUF_SIZE - pcm_buf_w_addr_;
-        pcm_buf_w_addr_ += FREQ_ANA_BUF_SIZE - pcm_buf_w_addr_;
-      }
-      else {
-        memcpy(pcm_buf_ + pcm_buf_w_addr_, pcm + pcm_r_addr, sizeof(RecvAudioType)*(pcm_len - pcm_r_addr));
-        pcm_buf_w_addr_ += pcm_len - pcm_r_addr;
-        pcm_r_addr += pcm_len - pcm_r_addr;
-      }
+  }
+  while (pcm_len - pcm_r_addr >= FREQ_ANA_BUF_SIZE) {
+    if (IF_LIKELY(WTPhysicalPcmToFreqMark(pcm + pcm_r_addr, FREQ_ANA_BUF_SIZE, &mark) != 0)) {
+      pcm_r_addr += FREQ_ANA_BUF_SIZE;
+      continue;
     }
+    pcm_r_addr += FREQ_ANA_BUF_SIZE;
+    RingBuffWriteData(ring_buff_fd_, &mark, sizeof(WTPhyFreqMarkType));
+  }
+
+  if(IF_LIKELY(pcm_r_addr<pcm_len)){
+    memcpy(pcm_buf_, pcm + pcm_r_addr, sizeof(RecvAudioType)*(pcm_len - pcm_r_addr));
+    pcm_buf_w_addr_ = pcm_len - pcm_r_addr;
   }
 }
 

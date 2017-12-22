@@ -8,6 +8,8 @@
 Makefile
 *.mk
 *.Makefile
+*.pcm
 /Default/
+/Debug/
 /.vs/
 /out/
