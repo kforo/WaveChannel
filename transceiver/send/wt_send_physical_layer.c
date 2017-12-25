@@ -60,8 +60,7 @@ WTSendPcmBuffType * WTSendPhyLayerGetPcm(WTSendPhyHander *hander, WTSendLinkPack
   for (i = 0; i < packages->package_num_; i++) {
     temp = (WTPhyFreqMarkType *)(&packages->package_[i]);
     for (j = 0; j < START_FREQ_NUM+ HBYTE_DATA_NUM+ HBYTE_CHECKSUM_NUM; j++) {
-      WTPhysicalFreqMarkToPcm(temp[j], (unsigned char *)hander_data->pcm_info_.buff_+ pcm_w_addr,
-        WTGetPcmSize(1,hander_data->sample_rate_)*(hander_data->sample_bit_ / 8),hander_data->sample_bit_,hander_data->sample_rate_);
+      WTPhysicalFreqMarkToPcm(temp[j], (unsigned char *)hander_data->pcm_info_.buff_+ pcm_w_addr,WTGetPcmSize(1,hander_data->sample_rate_)*(hander_data->sample_bit_ / 8),hander_data->sample_bit_,hander_data->sample_rate_);
       pcm_w_addr += WTGetPcmSize(1, hander_data->sample_rate_)*(hander_data->sample_bit_ / 8);
     }
   }

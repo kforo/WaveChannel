@@ -7,8 +7,8 @@
 
 #ifndef WIN32
 #include <pthread.h>
-static pthread_mutex_t buff_mutex_ = PTHREAD_MUTEX_INITIALIZER
-#define BUF_LOCK_INIT()               pthread_mutex_init(&buff_mutex_)
+static pthread_mutex_t buff_mutex_ = PTHREAD_MUTEX_INITIALIZER;
+#define BUF_LOCK_INIT()               pthread_mutex_init(&buff_mutex_,NULL)
 #define BUF_LOCK_EXIT()               pthread_mutex_destroy(&buff_mutex_)
 #define BUF_LOCK()                    pthread_mutex_lock(&buff_mutex_)
 #define BUF_UNLOCK()                  pthread_mutex_unlock(&buff_mutex_)
