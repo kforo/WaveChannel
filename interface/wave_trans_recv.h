@@ -3,9 +3,9 @@
 #include "proto_utils/wt_proto_common.h"
 
 
-int WaveTransRecvInit();
+int WaveTransRecvInit(void);
 
-void WaveTransRecvExit();
+void WaveTransRecvExit(void);
 
 void WaveTransRecvSetPcm(const RecvAudioType *pcm, int pcm_len);
 

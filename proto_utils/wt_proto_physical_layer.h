@@ -9,7 +9,7 @@ typedef unsigned char WTPhyFreqMarkType;
 
 int WTPhysicalPcmToFreqMark(const RecvAudioType *pcm_buf, int pcm_len, WTPhyFreqMarkType *freq_mark);
 
-int WTPhysicalFreqMarkToPcm(WTPhyFreqMarkType freq_mark, SendAudioType *pcm_buf, int pcm_len);
+int WTPhysicalFreqMarkToPcm(WTPhyFreqMarkType freq_mark, void  *pcm_buf, int pcm_len,int sample_bit);
 
 int WTPhyAnalysisNumToRealNum(int ana_num);
 

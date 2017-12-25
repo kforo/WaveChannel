@@ -10,15 +10,12 @@ typedef struct {
 }WaveTransPackageHalf;
 
 typedef struct {
-  unsigned char       byte_data_[HBYTE_DATA_NUM / 2];
-  unsigned short      check_sum_;
   int                 real_data_num_;
+  unsigned short      check_sum_;
+  unsigned char       byte_data_[HBYTE_DATA_NUM / 2];
 }WaveTransPackage;
 
-typedef struct {
-  int                     package_num_;
-  WaveTransPackageHalf    *package_;
-}WaveTransPackageS;
+
 
 void WTLinkHalfPackageToByte(WaveTransPackageHalf * half_package, WaveTransPackage * package);
 
@@ -26,10 +23,9 @@ int WTLinkCheckStMark(WTPhyFreqMarkType *st_mark);
 
 int WTLinkChecksumOk(WaveTransPackage * package);
 
-WaveTransPackageS * WTLinkGetPackageS(const void *data, int len);
+void WTLinkGetDataChecksum(WaveTransPackage *package);
 
-void WTLinkReleasePackageS(WaveTransPackageS *packages);
-
+void WTLinkPackageToHalf(const WaveTransPackage * package, WaveTransPackageHalf * half_package);
 
 
 #endif

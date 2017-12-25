@@ -3,7 +3,7 @@
 
 typedef void QueueFd;
 
-QueueFd *QueueCreate();
+QueueFd *QueueCreate(void);
 
 void QueueDestroy(QueueFd *fd);
 

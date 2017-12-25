@@ -97,10 +97,10 @@ static int FreqToFreqMark(int fft_freq, WTPhyFreqMarkType *mark)
     return -1;
   }
   if (left_inval < right_inval) {
-    *mark = left;
+    *mark = (WTPhyFreqMarkType)left;
   }
   else {
-    *mark = right;
+    *mark = (WTPhyFreqMarkType)right;
   }
   return 0;
 }
@@ -114,17 +114,29 @@ static int FreqMarkToFreq(WTPhyFreqMarkType freq_mark, int *freq)
   return -1;
 }
 
-static int EncodeSound(int freq, SendAudioType *buffer, int buffer_length)
+static int EncodeSound(int freq, void *buffer, int buffer_length,int sample_bit,int sample_rate)
 {
 
 
-  const double amplitude = 29200;
-  double theta_increment = 2.0 * PI * (freq) / (SEND_SAMPLE_RATE);
+  double amplitude;
+  double theta_increment = 2.0 * PI * (freq) / (sample_rate);
   int frame;
+  switch (sample_bit) {
+    case 8:amplitude = (double)((127 * AUDIO_AMPLITUDE_SCALE) / 100); break;
+    case 16:amplitude = (double)((32767 * AUDIO_AMPLITUDE_SCALE) / 100); break;
+    default:return -1;
+  }
 
-  for (frame = 0; frame < buffer_length; frame++) {
+  for (frame = 0; frame < (buffer_length/(sample_bit/8)); frame++) {
 
-    buffer[frame] = (SendAudioType)(sin(theta) * amplitude);
+    switch (sample_bit) {
+      case 8:
+        ((signed char *)buffer)[frame] = (signed char)(sin(theta) * amplitude); break;
+      case 16:
+        ((signed short *)buffer)[frame] = (short)(sin(theta) * amplitude); break;
+      default:
+        return -1;
+    }
     theta += theta_increment;
 
     if (theta > 2.0 * PI) {
@@ -149,13 +161,13 @@ int WTPhysicalPcmToFreqMark(const RecvAudioType * pcm_buf, int pcm_len, WTPhyFre
   return 0;
 }
 
-int WTPhysicalFreqMarkToPcm(WTPhyFreqMarkType freq_mark, SendAudioType * pcm_buf, int pcm_len)
+int WTPhysicalFreqMarkToPcm(WTPhyFreqMarkType freq_mark, void  *pcm_buf, int pcm_len, int sample_bit,int sample_rate)
 {
   int freq;
   if (FreqMarkToFreq(freq_mark, &freq) != 0) {
     return -1;
   }
-  if (EncodeSound(freq, pcm_buf, pcm_len) != 0) {
+  if (EncodeSound(freq, pcm_buf, pcm_len,sample_bit, sample_rate) != 0) {
     return -1;
   }
   return 0;

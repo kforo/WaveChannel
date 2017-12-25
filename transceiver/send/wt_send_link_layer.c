@@ -2,65 +2,77 @@
 #include "buff_utils/ring_buff.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-#define SEND_BUFF_LEN                   (2048)
-static RingBuffFd * send_data_buf_fd_ = NULL;
+typedef struct {
+  WTSendLinkPackageS       packages_;
+}WTLinkSendHanderData;
 
-static WTPhyFreqMarkType one_mark_temp_[ONE_PACKAGE_NUM];
-static int temp_w_addr_ = 0;
-
-static int GetNextPackage(WaveTransPackageHalf *package)
+WTSendLinkHander * WTSendLinkLayerCreateHander(void)
 {
-  int ret;
-  ret = RingBuffReadData(send_data_buf_fd_, &one_mark_temp_[temp_w_addr_], ONE_PACKAGE_NUM - temp_w_addr_);
-  if (ret <= 0) {
-    return -1;
+  WTLinkSendHanderData *hander_data = (WTLinkSendHanderData *)malloc(sizeof(WTLinkSendHanderData));
+  if (hander_data == NULL) {
+    return NULL;
   }
-  temp_w_addr_ += ret;
-  if (temp_w_addr_ < ONE_PACKAGE_NUM) {
-    return -1;
+  hander_data->packages_.package_num_ = 0;
+  hander_data->packages_.package_ = NULL;
+  WTSendLinkHander *hander = (WTSendLinkHander *)malloc(sizeof(WTSendLinkHander));
+  if (hander == NULL) {
+    free(hander_data);
+    return NULL;
   }
-  memcpy(package, one_mark_temp_, sizeof(WTPhyFreqMarkType)*ONE_PACKAGE_NUM);
-  temp_w_addr_ = 0;
-  return 0;
+  hander->data_ = hander_data;
+  return hander;
 }
 
-int WTSendLinkLayerInit()
+void WTSendLinkLayerDestroyHander(WTSendLinkHander * hander)
 {
-  send_data_buf_fd_ = RingBuffCreate(SEND_BUFF_LEN);
-  if (send_data_buf_fd_ == NULL) {
-    return -1;
+  WTLinkSendHanderData *hander_data = (WTLinkSendHanderData *)hander->data_;
+  if (hander_data->packages_.package_ != NULL) {
+    free(hander_data->packages_.package_);
+    hander_data->packages_.package_ = NULL;
   }
-  return 0;
+  free(hander->data_);
+  free(hander);
 }
 
-void WTSendLinkLayerExit()
+WTSendLinkPackageS * WTSendLinkLayerGetPackage(WTSendLinkHander * hander, void * context, int context_len)
 {
-  temp_w_addr_ = 0;
-  RingBuffDestroy(send_data_buf_fd_);
-}
-
-void WTSendLinkLayerSetData(const void * buf, int buf_len)
-{
-  WaveTransPackageS *packages = NULL;
-  packages = WTLinkGetPackageS(buf, buf_len);
-  if (packages == NULL) {
-    return;
-  }
+  int package_num;
+  int data_r_addr = 0;
+  WaveTransPackage one_package;
   int i;
-  for (i = 0; i < packages->package_num_; i++) {
-    RingBuffWriteData(send_data_buf_fd_, &packages->package_[i], sizeof(WaveTransPackageHalf));
+  if (context_len % (HBYTE_DATA_NUM / 2) != 0) {
+    package_num = context_len / (HBYTE_DATA_NUM / 2) + 1;
   }
-  WTLinkReleasePackageS(packages);
+  else {
+    package_num = context_len / (HBYTE_DATA_NUM / 2);
+  }
+  WTLinkSendHanderData *hander_data = (WTLinkSendHanderData *)hander->data_;
+  hander_data->packages_.package_ = (WaveTransPackageHalf *)malloc(sizeof(WaveTransPackageHalf)*package_num);
+  if (hander_data->packages_.package_ == NULL) {
+    return NULL;
+  }
+  hander_data->packages_.package_num_ = package_num;
+  for (i = 0; i < context_len / 4; i++) {
+    memcpy(&one_package.byte_data_, ((unsigned char *)context + data_r_addr), HBYTE_DATA_NUM / 2);
+    one_package.real_data_num_ = HBYTE_DATA_NUM / 2;
+    WTLinkGetDataChecksum(&one_package);
+    WTLinkPackageToHalf(&one_package, &hander_data->packages_.package_[i]);
+    data_r_addr += HBYTE_DATA_NUM / 2;
+  }
+  if (context_len % (HBYTE_DATA_NUM / 2) != 0) {
+    memcpy(&one_package.byte_data_, ((unsigned char *)context + data_r_addr), context_len % (HBYTE_DATA_NUM / 2));
+    one_package.real_data_num_ = context_len % (HBYTE_DATA_NUM / 2);
+    WTLinkGetDataChecksum(&one_package);
+    WTLinkPackageToHalf(&one_package, &hander_data->packages_.package_[i - 1]);
+  }
+  return &hander_data->packages_;
 }
 
-int WTSendLinkGetPackage(WaveTransPackageHalf * package, int package_len)
+void WTSendLinkLayerReleasePackage(WTSendLinkHander * hander)
 {
-  int i;
-  for (i = 0; i < package_len; i++) {
-    if (GetNextPackage(&package[i]) != 0) {
-      break;
-    }
-  }
-  return i;
+  WTLinkSendHanderData *hander_data = (WTLinkSendHanderData *)hander->data_;
+  free(hander_data->packages_.package_);
+  hander_data->packages_.package_ = NULL;
 }

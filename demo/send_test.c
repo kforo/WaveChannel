@@ -1,40 +1,41 @@
-#include "proto_utils/wt_proto_common.h"
-#include "interface/wave_trans_send.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "interface/wave_trans_send.h"
 
 
-
-int main()
+int main(void)
 {
   int ret;
   FILE *fp = NULL;
-  SendAudioType pcm_buf[2048] = { 0 };
   char test_context[] = "abcdefghigklmnopqrstuvwxyz123456789!@#$%^&*()";
-  if (WaveTransSendInit() != 0) {
-    printf("wave trans send init failed\n");
+  WaveTransSendHander *wt_send_hander = NULL;
+  WaveTransSendAttr attr;
+  attr.sample_bit_ = 16;
+  attr.sample_rate_ = 16000;
+  wt_send_hander = WaveTransSendCreateHander(&attr);
+  if (wt_send_hander == NULL) {
+    printf("wave trans send create hander failed\n");
     return 1;
   }
-  WaveTransSendSetContext(test_context, strlen(test_context));
+  WaveTransPcmInfo *pcm_info = WaveTransSendGetPcm(wt_send_hander, test_context, (int)strlen(test_context));
+  if (pcm_info == NULL) {
+    printf("wave trans send get pcm failed\n");
+    return 1;
+  }
   fp = fopen("test.pcm", "wb");
   if (fp == NULL) {
     printf("open file test.pcm failed\n");
-    WaveTransSendExit();
+    WaveTransSendDestroyHander(wt_send_hander);
     return 1;
   }
-  while (1) {
-    ret = WaveTransSendGetPcm(pcm_buf, 2048);
-    if (ret <= 0) {
-      break;
-    }
-    int temp = ret;
-    ret = fwrite(pcm_buf, 1, sizeof(SendAudioType)*temp, fp);
-    if (ret != (int)(temp*sizeof(SendAudioType))) {
-      printf("write to file failed,ret:%d\n", ret);
-      break;
-    }
+  ret = (int)fwrite(pcm_info->pcm_buff_, (size_t)1, (size_t)pcm_info->buff_len_, fp);
+  if (ret != pcm_info->buff_len_) {
+    fclose(fp);
+    WaveTransSendDestroyHander(wt_send_hander);
+    return 1;
   }
-  WaveTransSendExit();
+  fclose(fp);
+  WaveTransSendDestroyHander(wt_send_hander);
   return 0;
 }

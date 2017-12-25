@@ -3,13 +3,22 @@
 #include "proto_utils/wt_proto_link_layer.h"
 #define ONE_PACKAGE_NUM             (START_FREQ_NUM + HBYTE_DATA_NUM + HBYTE_CHECKSUM_NUM)
 
-int WTSendLinkLayerInit();
+typedef struct {
+  void          *data_;
+}WTSendLinkHander;
 
-void WTSendLinkLayerExit();
+typedef struct {
+  int                     package_num_;
+  WaveTransPackageHalf    *package_;
+}WTSendLinkPackageS;
 
-void WTSendLinkLayerSetData(const void *buf, int buf_len);
+WTSendLinkHander * WTSendLinkLayerCreateHander(void);
 
-int WTSendLinkGetPackage(WaveTransPackageHalf *package, int package_len);
+void WTSendLinkLayerDestroyHander(WTSendLinkHander *hander);
+
+WTSendLinkPackageS *WTSendLinkLayerGetPackage(WTSendLinkHander *hander, void *context, int context_len);
+
+void WTSendLinkLayerReleasePackage(WTSendLinkHander *hander);
 
 
 #endif

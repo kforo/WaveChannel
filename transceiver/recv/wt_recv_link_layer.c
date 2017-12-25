@@ -57,13 +57,13 @@ static int GetNextPackage(WaveTransPackage *package)
   return -1;
 }
 
-int WTRecvLinkLayerInit()
+int WTRecvLinkLayerInit(void)
 {
   package_temp_addr_ = 0;
   return 0; 
 }
 
-void WTRecvLinkLayerExit()
+void WTRecvLinkLayerExit(void)
 {
   package_temp_addr_ = 0;
 }

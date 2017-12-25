@@ -12,7 +12,7 @@ typedef struct {
   int             node_num_;
 }QueueInfoSt;
 
-QueueFd * QueueCreate()
+QueueFd * QueueCreate(void)
 {
   QueueInfoSt *fd = (QueueInfoSt *)malloc(sizeof(QueueInfoSt));
   if (fd == NULL) {

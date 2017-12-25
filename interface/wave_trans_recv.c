@@ -2,7 +2,7 @@
 #include "transceiver/recv/wt_recv_link_layer.h"
 #include "transceiver/recv/wt_recv_physical_layer.h"
 
-int WaveTransRecvInit()
+int WaveTransRecvInit(void)
 {
   if (WTRecvLinkLayerInit() != 0) {
     return -1;
@@ -13,7 +13,7 @@ int WaveTransRecvInit()
   return 0;
 }
 
-void WaveTransRecvExit()
+void WaveTransRecvExit(void)
 {
   WTRecvPhyLayerExit();
   WTRecvLinkLayerExit();

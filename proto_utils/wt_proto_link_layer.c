@@ -16,12 +16,12 @@ static void SetPackageStMark(WTPhyFreqMarkType *mark_data)
   }
 }
 
-static void GetDataChecksum(WaveTransPackage *package)
+void WTLinkGetDataChecksum(WaveTransPackage *package)
 {
   package->check_sum_ = crc_16(package->byte_data_, package->real_data_num_);
 }
 
-static void WTLinkPackageToHalf(const WaveTransPackage * package, WaveTransPackageHalf * half_package)
+void WTLinkPackageToHalf(const WaveTransPackage * package, WaveTransPackageHalf * half_package)
 {
   SetPackageStMark(half_package->st_mark_);
   int i, j = 0;
@@ -85,52 +85,4 @@ int WTLinkChecksumOk(WaveTransPackage * package)
     return 0;
   }
   return 1;
-}
-
-WaveTransPackageS * WTLinkGetPackageS(const void * data, int len)
-{
-  int package_num;
-  int data_r_addr = 0;
-  WaveTransPackage one_package;
-  int i;
-  unsigned char none_package[HBYTE_DATA_NUM];
-  for (i = 0; i < HBYTE_DATA_NUM; i++) {
-    none_package[i] = NONE_MAEK;
-  }
-  if (len % (HBYTE_DATA_NUM /2) != 0) {
-    package_num = len / (HBYTE_DATA_NUM / 2) + 1;
-  }
-  else {
-    package_num = len / (HBYTE_DATA_NUM / 2);
-  }
-  WaveTransPackageS *packages = (WaveTransPackageS *)malloc(sizeof(WaveTransPackageS));
-  if (packages == NULL) {
-    return NULL;
-  }
-  packages->package_ = (WaveTransPackageHalf *)malloc(sizeof(WaveTransPackageHalf)*package_num);
-  if (packages->package_ == NULL) {
-    free(packages);
-    return NULL;
-  }
-  packages->package_num_ = package_num;
-  for (i = 0; i < len / 4; i++) {
-    memcpy(&one_package.byte_data_, ((unsigned char *)data + data_r_addr), HBYTE_DATA_NUM / 2);
-    one_package.real_data_num_ = HBYTE_DATA_NUM / 2;
-    GetDataChecksum(&one_package);
-    WTLinkPackageToHalf(&one_package, &packages->package_[i]);
-    data_r_addr += HBYTE_DATA_NUM / 2;
-  }
-  if (len % (HBYTE_DATA_NUM / 2) != 0) {
-    memcpy(&one_package.byte_data_, ((unsigned char *)data + data_r_addr), len % (HBYTE_DATA_NUM / 2));
-    one_package.real_data_num_ = len % (HBYTE_DATA_NUM / 2);
-    GetDataChecksum(&one_package);
-    WTLinkPackageToHalf(&one_package, &packages->package_[package_num-1]);
-  }
-  return packages;
-}
-
-void WTLinkReleasePackageS(WaveTransPackageS * packages)
-{
-  free(packages->package_);
-  free(packages);
 }

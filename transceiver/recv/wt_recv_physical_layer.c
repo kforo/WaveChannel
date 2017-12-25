@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#define FREQ_ANA_BUF_SIZE               time_ms_to_length(FREQ_ANALYZE_SAMPLE_TIME_MS,SEND_SAMPLE_RATE)
+#define FREQ_ANA_BUF_SIZE               time_ms_to_length(FREQ_ANALYZE_SAMPLE_TIME_MS,RECV_SAMPLE_RATE)
 
 #ifndef WIN32
 #include <pthread.h>
@@ -62,7 +62,7 @@ static int GetNextData(WTPhyFreqMarkType *data)
 }
 
 
-int WTRecvPhyLayerInit()
+int WTRecvPhyLayerInit(void)
 {
   ring_buff_fd_ = RingBuffCreate(RING_BUFF_LEN);
   if (ring_buff_fd_ == NULL) {
@@ -75,7 +75,7 @@ int WTRecvPhyLayerInit()
   return 0;
 }
 
-void WTRecvPhyLayerExit()
+void WTRecvPhyLayerExit(void)
 {
   BUF_LOCK();
   RingBuffDestroy(ring_buff_fd_);

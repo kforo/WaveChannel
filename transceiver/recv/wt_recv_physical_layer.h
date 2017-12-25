@@ -4,9 +4,9 @@
 #include "proto_utils/wt_proto_common.h"
 
 
-int WTRecvPhyLayerInit();
+int WTRecvPhyLayerInit(void);
 
-void WTRecvPhyLayerExit();
+void WTRecvPhyLayerExit(void);
 
 void WTRecvPhyLayerSendPcm(const RecvAudioType *pcm, int pcm_len);
 

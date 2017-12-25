@@ -4,6 +4,7 @@
 /*send and recv side config*/
 #define FREQ_LIST               {1765,1986,2211,2492,2799,3243,3482,3751,3987,4192,4430,4794,5000,5449,5900,6262,6627,7004}
 #define FREQ_LIST_LEN           (18)
+#define MAX_FREQ                (7004)
 #define START_FREQ_NUM                  (2)
 #define HBYTE_DATA_NUM                  (8)
 #define HBYTE_CHECKSUM_NUM              (4)
@@ -26,15 +27,7 @@ typedef short   RecvAudioType;
 
 
 /*send side config*/
-#define SEND_SAMPLE_BIT                         (16)
-//#define SEND_SAMPLE_RATE                        (44100)
-#define SEND_SAMPLE_RATE                        (16000)
-#if (SEND_SAMPLE_BIT==16)
-typedef short   SendAudioType;
-#endif
-#if (SEND_SAMPLE_BIT==8)
-typedef char    SendAudioType;
-#endif
+#define  AUDIO_AMPLITUDE_SCALE            (85)  //AUDIO_AMPLITUDE_SCALE/100 * max value
 
 
 

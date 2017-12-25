@@ -2,43 +2,78 @@
 #include "wt_send_link_layer.h"
 #include "proto_utils/wt_proto_common.h"
 #include "proto_utils/wt_proto_physical_layer.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-static WTPhyFreqMarkType  data_temp_[ONE_PACKAGE_NUM];
-static int data_temp_r_addr_ = ONE_PACKAGE_NUM;
+typedef struct {
+  int         sample_rate_;
+  int         sample_bit_;
+  WTSendPcmBuffType       pcm_info_;
+}WTPhySendHanderData;
 
-int WTSendPhyLayerInit()
+static int WTGetPcmSize(int mark_num,int sample_rate)
 {
-  return 0; 
+  return time_ms_to_length(mark_num*ONE_FREQ_TIME_MS, sample_rate);
 }
 
-void WTSendPhyLayerExit()
+WTSendPhyHander * WTSendPhyLayerCreatHander(WTSendPhyHanderAttr *attr)
 {
-  data_temp_r_addr_ = ONE_PACKAGE_NUM;
+  WTPhySendHanderData *hander_data = (WTPhySendHanderData *)malloc(sizeof(WTPhySendHanderData));
+  if (hander_data == NULL) {
+    return NULL;
+  }
+  WTSendPhyHander *hander = (WTSendPhyHander *)malloc(sizeof(WTSendPhyHander));
+  if (hander == NULL) {
+    free(hander_data);
+    return NULL;
+  }
+  hander_data->pcm_info_.buff_ = NULL;
+  hander_data->sample_bit_ = attr->sample_bit_;
+  hander_data->sample_rate_ = attr->sample_rate_;
+  hander->data_ = hander_data;
+  return hander;
 }
 
-int WTSendPhyLayerGetPcm(SendAudioType * pcm, int pcm_len)
+void WTSendPhyLayerDestroyHander(WTSendPhyHander * hander)
 {
-  int one_mark_pcm_len = time_ms_to_length(ONE_FREQ_TIME_MS, SEND_SAMPLE_RATE);
+  WTPhySendHanderData *hander_data = (WTPhySendHanderData *)hander->data_;
+  if (hander_data->pcm_info_.buff_ != NULL) {
+    free(hander_data->pcm_info_.buff_);
+    hander_data->pcm_info_.buff_ = NULL;
+  }
+  free(hander->data_);
+  free(hander);
+}
+
+WTSendPcmBuffType * WTSendPhyLayerGetPcm(WTSendPhyHander *hander, WTSendLinkPackageS *packages)
+{
+  int one_package_size = sizeof(WaveTransPackageHalf) / sizeof(WTPhyFreqMarkType);
+  int mark_num = one_package_size * packages->package_num_;
+  WTPhySendHanderData *hander_data = (WTPhySendHanderData *)hander->data_;
+  hander_data->pcm_info_.buff_ = malloc((hander_data->sample_bit_ / 8)*WTGetPcmSize(mark_num, hander_data->sample_rate_));
+  if (hander_data->pcm_info_.buff_ == NULL) {
+    return NULL;
+  }
+  WTPhyFreqMarkType *temp;
   int pcm_w_addr = 0;
-  while (pcm_len - pcm_w_addr >= one_mark_pcm_len) {
-    if (data_temp_r_addr_ >= ONE_PACKAGE_NUM) {
-      int ret = WTSendLinkGetPackage((WaveTransPackageHalf *)data_temp_, 1);
-      if (ret <= 0) {
-        break;
-      }
-      data_temp_r_addr_ = 0;
-      continue;
-    }
-    else {
-      WTPhysicalFreqMarkToPcm(data_temp_[data_temp_r_addr_], pcm + pcm_w_addr, one_mark_pcm_len);
-      data_temp_r_addr_++;
-      pcm_w_addr += one_mark_pcm_len;
+  int i, j;
+  for (i = 0; i < packages->package_num_; i++) {
+    temp = (WTPhyFreqMarkType *)(&packages->package_[i]);
+    for (j = 0; j < START_FREQ_NUM+ HBYTE_DATA_NUM+ HBYTE_CHECKSUM_NUM; j++) {
+      WTPhysicalFreqMarkToPcm(temp[j], (unsigned char *)hander_data->pcm_info_.buff_+ pcm_w_addr,
+        WTGetPcmSize(1,hander_data->sample_rate_)*(hander_data->sample_bit_ / 8),hander_data->sample_bit_,hander_data->sample_rate_);
+      pcm_w_addr += WTGetPcmSize(1, hander_data->sample_rate_)*(hander_data->sample_bit_ / 8);
     }
   }
-  return pcm_w_addr;
+  hander_data->pcm_info_.buff_len_ = (hander_data->sample_bit_ / 8)*WTGetPcmSize(mark_num, hander_data->sample_rate_);
+  hander_data->pcm_info_.sample_bit_ = hander_data->sample_bit_;
+  hander_data->pcm_info_.sample_rate_ = hander_data->sample_rate_;
+  return &hander_data->pcm_info_;
 }
 
-//void WTSendPhyLayerSetData(const void *data_buf, int buf_len)
-//{
-//  WTSendLinkLayerSetData(data_buf, buf_len);
-//}
+void WTSendPhyLayerReleasePcm(WTSendPhyHander * handler)
+{
+  WTPhySendHanderData *hander_data = (WTPhySendHanderData *)handler->data_;
+  free(hander_data->pcm_info_.buff_);
+  hander_data->pcm_info_.buff_ = NULL;
+}
