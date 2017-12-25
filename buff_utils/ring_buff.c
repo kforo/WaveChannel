@@ -90,7 +90,7 @@ int RingBuffReadData(RingBuffFd *fd, void *data, int len)
     return 0;
   }
   if (fd_data->read_addr_ > fd_data->write_addr_) {
-    int right_len = fd_data->buff_len_ - fd_data->read_addr_ + 1;
+    int right_len = fd_data->buff_len_ - fd_data->read_addr_;
     if (right_len > len) {
       memcpy(data, &fd_data->buff_[fd_data->read_addr_], len);
       fd_data->read_addr_ += len;
@@ -101,7 +101,9 @@ int RingBuffReadData(RingBuffFd *fd, void *data, int len)
       fd_data->read_addr_ = 0;
       int left_len = fd_data->write_addr_;
       if (left_len < len - right_len) {
-        return left_len;
+        memcpy((unsigned char *)data + right_len, &fd_data->buff_[0], left_len);
+        fd_data->read_addr_ = left_len;
+        return left_len+right_len;
       }
       else {
         memcpy(((unsigned char *)data + right_len), &fd_data->buff_[fd_data->read_addr_], len - right_len);
