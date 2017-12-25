@@ -19,7 +19,7 @@ typedef struct {
 
 void WTLinkHalfPackageToByte(WaveTransPackageHalf * half_package, WaveTransPackage * package);
 
-int WTLinkCheckStMark(WTPhyFreqMarkType *st_mark);
+int WTLinkCheckStMark(WTPhyFreqMarkType st_mark,int mark_num);
 
 int WTLinkChecksumOk(WaveTransPackage * package);
 

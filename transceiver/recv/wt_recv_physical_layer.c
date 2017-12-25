@@ -107,12 +107,14 @@ void WTRecvPhyLayerSendPcm(const RecvAudioType * pcm, int pcm_len)
       RingBuffWriteData(ring_buff_fd_, &mark, sizeof(WTPhyFreqMarkType));
       BUF_UNLOCK();
     }
+   // printf(" %d ", mark);
   }
   while (pcm_len - pcm_r_addr >= FREQ_ANA_BUF_SIZE) {
     if (WTPhysicalPcmToFreqMark(pcm + pcm_r_addr, FREQ_ANA_BUF_SIZE, &mark) != 0) {
       pcm_r_addr += FREQ_ANA_BUF_SIZE;
       continue;
     }
+   // printf(" %d ", mark);
     pcm_r_addr += FREQ_ANA_BUF_SIZE;
     BUF_LOCK();
     RingBuffWriteData(ring_buff_fd_, &mark, sizeof(WTPhyFreqMarkType));

@@ -12,16 +12,16 @@ static int GetNextPackage(WaveTransPackage *package)
 {
   int ret;
   if (package_temp_addr_ >= 0 && package_temp_addr_ < START_FREQ_NUM) {    //find package start mark
-     while((ret = WTRecvPhyLayerGetData(&package_temp.st_mark_[package_temp_addr_], START_FREQ_NUM - package_temp_addr_))>0){
-      if (ret != START_FREQ_NUM - package_temp_addr_) {
-        package_temp_addr_ += ret;
-        continue;
-      }
-      package_temp_addr_ = START_FREQ_NUM;
-      if (WTLinkCheckStMark(package_temp.st_mark_) == 1) {
-        break;
-      }
-      package_temp_addr_ = 0;
+re_read_st: while((ret = WTRecvPhyLayerGetData(&package_temp.st_mark_[package_temp_addr_], START_FREQ_NUM - package_temp_addr_))>0){
+       int i;
+       for (i = 0; i < ret; i++) {
+         if (WTLinkCheckStMark(package_temp.st_mark_[package_temp_addr_ + i], package_temp_addr_ + i) != 1) {
+           package_temp_addr_ = 0;
+           goto re_read_st;
+         }
+       }
+       package_temp_addr_ += ret;
+       break;
     }
   }
   if (package_temp_addr_ >= START_FREQ_NUM&&package_temp_addr_ < START_FREQ_NUM + HBYTE_DATA_NUM) {     //read half_byte_data_

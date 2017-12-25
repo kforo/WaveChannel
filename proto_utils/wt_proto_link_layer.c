@@ -67,13 +67,10 @@ void WTLinkHalfPackageToByte(WaveTransPackageHalf * half_package, WaveTransPacka
   }
 }
 
-int WTLinkCheckStMark(WTPhyFreqMarkType * st_mark)
+int WTLinkCheckStMark(WTPhyFreqMarkType st_mark, int mark_num)
 {
-  int i;
-  for (i = 0; i < START_FREQ_NUM; i++) {
-    if (st_mark[i] != proto_st_mark_[i]) {
-      return 0;
-    }
+  if (st_mark != proto_st_mark_[mark_num]) {
+    return 0;
   }
   return 1;
 }
