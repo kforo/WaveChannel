@@ -53,6 +53,11 @@
         'include_dirs': [
           '.',
         ],
+        'direct_dependent_settings': {
+          'include_dirs': [
+            '.',       
+           ],
+        },
         'sources': [
           'buff_utils/queue.c',
           'buff_utils/queue.h',
