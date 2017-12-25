@@ -35,7 +35,9 @@ static int GetPcmMaxAmplitudeFreq(const RecvAudioType *pcm_buf, int len, int thr
   int size = len / 2;
   double max_item = 0;
   int max_item_mark = 0;
-  for (i = 0; i < size; i++) {
+  int find_left = ((MIN_FREQ - (2 * MAX_FREQ_MISTAKE))*len) / RECV_SAMPLE_RATE;
+  int find_right = ((MAX_FREQ + (2 * MAX_FREQ_MISTAKE))*len) / RECV_SAMPLE_RATE;
+  for (i=find_left; i < find_right; i++) {
     double out_data_item = sqrt(pow(out_data[i].r, 2) + pow(out_data[i].i, 2));
     if (out_data_item > max_item) {
       max_item = out_data_item;

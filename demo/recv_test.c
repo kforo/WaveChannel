@@ -26,7 +26,7 @@ int main()
     return 1;
   }
   while (1) {
-    ret = fread(pcm_buf, 1, sizeof(RecvAudioType) * 1024, fp);
+    ret = (int)fread(pcm_buf, (size_t)1, (size_t)(sizeof(RecvAudioType) * 1024), fp);
     WaveTransRecvSetPcm(pcm_buf, ret / sizeof(RecvAudioType));
     ret = WaveTransRecvGetContext(data_temp, sizeof(char) * 10);
     if (ret != 0) {

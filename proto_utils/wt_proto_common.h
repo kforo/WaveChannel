@@ -5,6 +5,7 @@
 #define FREQ_LIST               {1765,1986,2211,2492,2799,3243,3482,3751,3987,4192,4430,4794,5000,5449,5900,6262,6627,7004}
 #define FREQ_LIST_LEN           (18)
 #define MAX_FREQ                (7004)
+#define MIN_FREQ                (1765)
 #define START_FREQ_NUM                  (2)
 #define HBYTE_DATA_NUM                  (8)
 #define HBYTE_CHECKSUM_NUM              (4)
