@@ -25,6 +25,7 @@ int main()
     WaveTransRecvExit();
     return 1;
   }
+  FILE *temp_fp = fopen("test-temp.pcm", "wb");
   while (1) {
     ret = (int)fread(pcm_buf, (size_t)1, (size_t)(sizeof(RecvAudioType) * 320), fp);
     WaveTransRecvSetPcm(pcm_buf, ret / sizeof(RecvAudioType));

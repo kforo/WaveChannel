@@ -65,7 +65,7 @@ WTSendLinkPackageS * WTSendLinkLayerGetPackage(WTSendLinkHander * hander, void *
     memcpy(&one_package.byte_data_, ((unsigned char *)context + data_r_addr), context_len % (HBYTE_DATA_NUM / 2));
     one_package.real_data_num_ = context_len % (HBYTE_DATA_NUM / 2);
     WTLinkGetDataChecksum(&one_package);
-    WTLinkPackageToHalf(&one_package, &hander_data->packages_.package_[i - 1]);
+    WTLinkPackageToHalf(&one_package, &hander_data->packages_.package_[hander_data->packages_.package_num_ - 1]);
   }
   return &hander_data->packages_;
 }

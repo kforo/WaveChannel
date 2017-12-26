@@ -12,7 +12,7 @@
 #define START_FREQ_MARK                  {16,17}
 #define NONE_MAEK                        (17)
 #define ONE_FREQ_TIME_MS                 (24)
-#define time_ms_to_length(time_ms,sample_rate)          ((time_ms*sample_rate)/1000)
+#define time_ms_to_length(time_ms,sample_rate)          (((time_ms)*(sample_rate))/1000)
 
 /*recv side config*/
 #define RECV_SAMPLE_BIT                         (16)
