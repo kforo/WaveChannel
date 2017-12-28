@@ -6,10 +6,6 @@
 #include <math.h>
 #include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*
  ATTENTION!
  If you would like a :
@@ -117,8 +113,6 @@ int kiss_fft_next_fast_size(int n);
 #define kiss_fftr_next_fast_size_real(n) \
         (kiss_fft_next_fast_size( ((n)+1)>>1)<<1)
 
-#ifdef __cplusplus
-} 
-#endif
+
 
 #endif

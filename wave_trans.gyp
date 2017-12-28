@@ -122,5 +122,33 @@
           'libwavetrans',
         ],
       }, #target wave_tran_send
+      {
+        'target_name': 'wave_tran_phy_send',
+        'type': 'executable',
+        'include_dirs': [
+          './demo',
+          '.',
+        ],
+        'sources': [
+          'demo/phy_send_test.c',
+        ],
+        'dependencies': [
+          'libwavetrans',
+        ],
+      }, #target wave_tran_phy_send
+      {
+        'target_name': 'wave_tran_phy_recv',
+        'type': 'executable',
+        'include_dirs': [
+          './demo',
+          '.',
+        ],
+        'sources': [
+          'demo/phy_recv_test.c',
+        ],
+        'dependencies': [
+          'libwavetrans',
+        ],
+      }, #target wave_tran_phy_recv
     ],
 }
