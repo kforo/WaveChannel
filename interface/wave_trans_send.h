@@ -1,6 +1,10 @@
 #ifndef __WAVE_TRANS_SEND_H__
 #define __WAVE_TRANS_SEND_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
   void            *data_;
 }WaveTransSendHander;
@@ -21,7 +25,11 @@ WaveTransSendHander *WaveTransSendCreateHander(WaveTransSendAttr *attr);
 
 void WaveTransSendDestroyHander(WaveTransSendHander *hander);
 
-WaveTransPcmInfo *WaveTransSendGetPcm(WaveTransSendHander *hander,void *context, int context_len);
+WaveTransPcmInfo *WaveTransSendGetPcm(WaveTransSendHander *hander,const void *context, int context_len);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

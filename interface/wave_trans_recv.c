@@ -2,6 +2,10 @@
 #include "transceiver/recv/wt_recv_link_layer.h"
 #include "transceiver/recv/wt_recv_physical_layer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int WaveTransRecvInit(void)
 {
   if (WTRecvLinkLayerInit() != 0) {
@@ -28,3 +32,8 @@ int WaveTransRecvGetContext(void * context, int context_len)
 {
   return WTRecvLinkLayerGetData(context, context_len);
 }
+
+
+#ifdef __cplusplus
+}
+#endif
