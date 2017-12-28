@@ -12,8 +12,9 @@ typedef struct {
 }MixingFreqInfo;
 
 typedef struct {
-  double      item;
-  int         mark;
+  long        item_;
+  int         mark_;
+  long        diff_;
 }FFTAnalysisSt;
 
 static int format_freq_list_[FREQ_LIST_LEN] = FREQ_LIST;
@@ -82,27 +83,61 @@ error_exit:
 
 static void GetFreqsFromCpx(int nfft, const kiss_fft_cpx *result, MixingFreqInfo *freqs_info, int threshold)
 {
-  FFTAnalysisSt max_item[MIXING_FREQ_NUM];
-  double *diff_data = NULL;
+  FFTAnalysisSt *diff_data = NULL;
   int find_left = ((MIN_FREQ - (2 * MAX_FREQ_MISTAKE))*nfft) / RECV_SAMPLE_RATE;
   int find_right = ((MAX_FREQ + (2 * MAX_FREQ_MISTAKE))*nfft) / RECV_SAMPLE_RATE;
+  FFTAnalysisSt *max_item[MIXING_FREQ_NUM];
   int diff_data_len = find_right - find_left;
-  diff_data = malloc(sizeof(double)*diff_data_len);
+  diff_data = malloc(sizeof(FFTAnalysisSt)*diff_data_len);
   if (diff_data == NULL) {
     return;
   }
+  memset(diff_data, 0, sizeof(FFTAnalysisSt)*diff_data_len);
+  memset(max_item, 0, sizeof(FFTAnalysisSt *)*MIXING_FREQ_NUM);
   int i;
   for (i = find_left; i < find_right; i++) {
-    double out_data_item = sqrt(pow(result[i].r, 2) + pow(result[i].i, 2));
+    long out_data_item = (long)(sqrt(pow(result[i].r, 2) + pow(result[i].i, 2)));
     if (i == find_left) {
-      diff_data[i - find_left] = out_data_item;
+      diff_data[i - find_left].item_ = out_data_item;
+      diff_data[i - find_left].diff_ = out_data_item;
+      diff_data[i - find_left].mark_ = i;
     }
     else {
-      diff_data[i - find_left] = out_data_item;
-      diff_data[i - find_left - 1] = diff_data[i - find_left] - diff_data[i - find_left - 1];
+      diff_data[i - find_left].item_ = out_data_item;
+      diff_data[i - find_left - 1].diff_ = diff_data[i - find_left].item_ - diff_data[i - find_left - 1].item_;
+      diff_data[i - find_left].mark_ = i;
     }
   }
-
+  for (i = 1; i < diff_data_len; i++) {
+    if (diff_data[i].diff_ <= 0 && diff_data[i - 1].diff_ > 0) {
+      int j;
+      for (j = 0; j < MIXING_FREQ_NUM; j++) {
+        if (max_item[j] == NULL) {
+          max_item[j] = &diff_data[i];
+          break;
+        }
+        else if(diff_data[i].item_>max_item[j]->item_) {
+          int temp;
+          for (temp = MIXING_FREQ_NUM - 1; temp > j; temp--) {
+            max_item[temp] = max_item[temp - 1];
+          }
+          max_item[j] = &diff_data[i];
+          break;
+        }
+      }
+    }
+  }
+  freqs_info->freq_num_ = 0;
+  for (i = 0; i < MIXING_FREQ_NUM; i++) {
+    if (max_item[i] != NULL) {
+      long amplite = max_item[i]->item_ / (nfft / 2);
+      if (amplite >= threshold) {
+        freqs_info->freqs_[freqs_info->freq_num_] = (max_item[i]->mark_*RECV_SAMPLE_RATE) / nfft;
+        freqs_info->freq_num_++;
+      }
+    }
+  }
+  free(diff_data);
 }
 
 static int GetPcmFreqs(const RecvAudioType *pcm_buf, int len, int threshold, MixingFreqInfo *freqs_info)
