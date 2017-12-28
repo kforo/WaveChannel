@@ -95,7 +95,7 @@ void WaveTransSendDestroyHander(WaveTransSendHander * hander)
   free(hander);
 }
 
-WaveTransPcmInfo * WaveTransSendGetPcm(WaveTransSendHander *hander, void * context, int context_len)
+WaveTransPcmInfo * WaveTransSendGetPcm(WaveTransSendHander *hander,const void * context, int context_len)
 {
   WaveTransSendHanderData *hander_data = (WaveTransSendHanderData *)hander->data_;
   WTSendLinkPackageS *packages = WTSendLinkLayerGetPackage(hander_data->link_hander_, context, context_len);

@@ -16,7 +16,7 @@ WTSendLinkHander * WTSendLinkLayerCreateHander(void);
 
 void WTSendLinkLayerDestroyHander(WTSendLinkHander *hander);
 
-WTSendLinkPackageS *WTSendLinkLayerGetPackage(WTSendLinkHander *hander, void *context, int context_len);
+WTSendLinkPackageS *WTSendLinkLayerGetPackage(WTSendLinkHander *hander,const void *context, int context_len);
 
 void WTSendLinkLayerReleasePackage(WTSendLinkHander *hander);
 

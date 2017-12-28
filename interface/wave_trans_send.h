@@ -25,7 +25,7 @@ WaveTransSendHander *WaveTransSendCreateHander(WaveTransSendAttr *attr);
 
 void WaveTransSendDestroyHander(WaveTransSendHander *hander);
 
-WaveTransPcmInfo *WaveTransSendGetPcm(WaveTransSendHander *hander,void *context, int context_len);
+WaveTransPcmInfo *WaveTransSendGetPcm(WaveTransSendHander *hander,const void *context, int context_len);
 
 
 #ifdef __cplusplus

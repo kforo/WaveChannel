@@ -36,7 +36,7 @@ void WTSendLinkLayerDestroyHander(WTSendLinkHander * hander)
   free(hander);
 }
 
-WTSendLinkPackageS * WTSendLinkLayerGetPackage(WTSendLinkHander * hander, void * context, int context_len)
+WTSendLinkPackageS * WTSendLinkLayerGetPackage(WTSendLinkHander * hander,const void * context, int context_len)
 {
   int package_num;
   int data_r_addr = 0;
