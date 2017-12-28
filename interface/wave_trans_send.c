@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
   WTSendLinkHander      *link_hander_;
   WTSendPhyHander       *phy_hander_;
@@ -121,3 +125,8 @@ WaveTransPcmInfo * WaveTransSendGetPcm(WaveTransSendHander *hander, void * conte
   WTSendLinkLayerReleasePackage(hander_data->link_hander_);
   return &hander_data->pcm_info_;
 }
+
+
+#ifdef __cplusplus
+}
+#endif
