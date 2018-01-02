@@ -7,8 +7,12 @@
 int main(void)
 {
   int ret;
-  FILE *fp = NULL;
-  char test_context[] = "1234567891239";
+  FILE *in_fp = NULL;
+  FILE *out_fp = NULL;
+  char data_buff[1024] = { 0 };
+  int buff_len = 1024;
+  char input_file[] = "send-data.txt";
+  char output_file[] = "test.pcm";
   WaveTransSendHander *wt_send_hander = NULL;
   WaveTransSendAttr attr;
   attr.sample_bit_ = 16;
@@ -18,24 +22,38 @@ int main(void)
     printf("wave trans send create hander failed\n");
     return 1;
   }
-  WaveTransPcmInfo *pcm_info = WaveTransSendGetPcm(wt_send_hander, test_context, (int)strlen(test_context));
-  if (pcm_info == NULL) {
-    printf("wave trans send get pcm failed\n");
-    return 1;
-  }
-  fp = fopen("test.pcm", "wb");
-  if (fp == NULL) {
-    printf("open file test.pcm failed\n");
+  in_fp = fopen(input_file, "r");
+  if (in_fp == NULL) {
+    printf("without %s file\n", input_file);
     WaveTransSendDestroyHander(wt_send_hander);
     return 1;
   }
-  ret = (int)fwrite(pcm_info->pcm_buff_, (size_t)1, (size_t)pcm_info->buff_len_, fp);
-  if (ret != pcm_info->buff_len_) {
-    fclose(fp);
+  out_fp = fopen(output_file, "wb");
+  if (out_fp == NULL) {
+    printf("open file :%s failed\n", output_file);
     WaveTransSendDestroyHander(wt_send_hander);
     return 1;
   }
-  fclose(fp);
-  WaveTransSendDestroyHander(wt_send_hander);
+  while ((ret = fread(data_buff, 1, sizeof(char)*buff_len, in_fp)) != 0) {
+    WaveTransPcmInfo *pcm_info = WaveTransSendGetPcm(wt_send_hander, data_buff, ret);
+    if (pcm_info == NULL) {
+      printf("get pcm data failed\n");
+      continue;
+    }
+    int temp = fwrite(pcm_info->pcm_buff_, 1, pcm_info->buff_len_, out_fp);
+    if (temp != pcm_info->buff_len_) {
+      printf("write pcm data failed\n");
+      continue;
+    }
+  }
+  if (in_fp != NULL) {
+    fclose(in_fp);
+  }
+  if (out_fp != NULL) {
+    fclose(out_fp);
+  }
+  if (wt_send_hander != NULL) {
+    WaveTransSendDestroyHander(wt_send_hander);
+  }
   return 0;
 }

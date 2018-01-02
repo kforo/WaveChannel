@@ -54,7 +54,6 @@ int main()
       printf("write file failed\n");
       break;
     }
-    break;
     if (GetNextFreqMarks(&freq_info) != 0) {
       break;
     }

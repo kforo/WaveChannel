@@ -9,6 +9,10 @@ typedef struct {
 }WTSendPhyHander;
 
 typedef struct {
+  void      *data_;
+}WTSendPhyForMixHander;
+
+typedef struct {
   void          *buff_;
   int           buff_len_;
   int           sample_rate_;
@@ -26,7 +30,18 @@ void WTSendPhyLayerDestroyHander(WTSendPhyHander * hander);
 
 WTSendPcmBuffType * WTSendPhyLayerGetPcm(WTSendPhyHander *hander, WTSendLinkPackageS *packages);
 
-void WTSendPhyLayerReleasePcm(WTSendPhyHander *handler);
+void WTSendPhyLayerReleasePcm(WTSendPhyHander *hander);
+
+
+
+
+WTSendPhyForMixHander *WTSendPhyLayerCreatHanderForMix(WTSendPhyHanderAttr *attr);
+
+void WTSendPhyLayerDestroyHanderForMix(WTSendPhyForMixHander * hander);
+
+WTSendPcmBuffType * WTSendPhyLayerGetPcmMixing(WTSendPhyForMixHander *hander, WTSendLinkMixPackageS *packages);
+
+void WTSendPhyLayerReleasePcmMixing(WTSendPhyForMixHander *hander);
 
 #endif
 

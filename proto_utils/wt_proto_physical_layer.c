@@ -364,9 +364,9 @@ int WTPhysicalFreqMarkToPcm(WTPhyFreqMarkType freq_mark, void  *pcm_buf, int pcm
   return 0;
 }
 
-int WTPhysicalPcmToFreqMarks(const RecvAudioType * pcm_buf, int pcm_len, WaveTransMixinfFreqInfo * freq_marks)
+int WTPhysicalPcmToFreqMarks(const RecvAudioType * pcm_buf, int pcm_len, WaveTransMixFreqMark * freq_marks)
 {
-  int threshold = 50;
+  int threshold = 550;
   MixingFreqInfo freq_info;
   if (GetPcmFreqs(pcm_buf, pcm_len, threshold, &freq_info) != 0) {
     return -1;
@@ -384,7 +384,7 @@ int WTPhysicalPcmToFreqMarks(const RecvAudioType * pcm_buf, int pcm_len, WaveTra
   return 0;
 }
 
-int WTPhysicalFreqMarksToPcm(const WaveTransMixinfFreqInfo * freq_marks, void * pcm_buf, int pcm_len, int sample_bit, int sample_rate)
+int WTPhysicalFreqMarksToPcm(const WaveTransMixFreqMark * freq_marks, void * pcm_buf, int pcm_len, int sample_bit, int sample_rate)
 {
   MixingFreqInfo freq_info;
   int i;

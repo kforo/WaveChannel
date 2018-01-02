@@ -12,6 +12,12 @@ typedef struct {
   WaveTransPackageHalf    *package_;
 }WTSendLinkPackageS;
 
+
+typedef struct {
+  int                     package_num_;
+  WaveTransPackageMix     *package_;
+}WTSendLinkMixPackageS;
+
 WTSendLinkHander * WTSendLinkLayerCreateHander(void);
 
 void WTSendLinkLayerDestroyHander(WTSendLinkHander *hander);

@@ -15,9 +15,10 @@ int main()
   short pcm_buf[128];
   int buf_len = 128;
   int ret;
-  fp = fopen("mix-test.pcm", "rb");
+  printf("test demo start\n");
+  fp = fopen("r-test.pcm", "rb");
   if (fp == NULL) {
-    printf("open file mix-test.pcm failed\n");
+    printf("open file r-test.pcm failed\n");
     return 1;
   }
   while ((ret = fread(pcm_buf, 1, sizeof(short)*buf_len, fp)) == (sizeof(short)*buf_len)) {
@@ -26,10 +27,12 @@ int main()
       continue;
     }
     int i;
-    for (i = 0; i < freq_info.freq_mark_num_; i++) {
-      printf(" %d ", freq_info.marks_[i]);
+    if (freq_info.freq_mark_num_ != 0) {
+      for (i = 0; i < freq_info.freq_mark_num_; i++) {
+        printf(" %d ", freq_info.marks_[i]);
+      }
+      printf("\n");
     }
-    printf("\n");
   }
   fclose(fp);
   getchar();

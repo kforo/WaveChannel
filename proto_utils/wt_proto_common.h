@@ -2,6 +2,7 @@
 #define __WT_PROTO_COMMON_H__
 
 /*global config*/
+#define FREQ_MODE_MUX
 #define FREQ_LIST               {1765,1986,2211,2492,2799,3243,3482,3751,3987,4192,4430,4794,5000,5449,5900,6262,6627,7004}
 #define FREQ_LIST_LEN           (18)
 #define MAX_FREQ                (7004)
@@ -15,6 +16,10 @@
 #define time_ms_to_length(time_ms,sample_rate)          (((time_ms)*(sample_rate))/1000)
 
 #define MIXING_FREQ_NUM                   (4)
+#define MIXING_MARK_PROGRESSIVE           (4)
+#define MIXING_BYTE_ST_NUM                (1)    
+#define MIXING_BYTE_DATA_NUM              (4)
+#define MIXING_CHECKSUM_NUM               (2)
 
 /*recv side config*/
 #define RECV_SAMPLE_BIT                         (16)
