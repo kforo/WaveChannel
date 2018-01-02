@@ -1,4 +1,4 @@
-#include "crc_codec.h.h"
+#include "crc_codec.h"
 
 #ifdef __cplusplus
 extern "C" {
