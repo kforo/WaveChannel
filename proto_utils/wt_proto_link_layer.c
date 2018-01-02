@@ -1,5 +1,5 @@
 #include "wt_proto_link_layer.h"
-#include "checksum_utils/crc_codec.h.h"
+#include "checksum_utils/crc_codec.h"
 #include <stdlib.h>
 #include <string.h>
 
