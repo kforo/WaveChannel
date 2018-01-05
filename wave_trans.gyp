@@ -92,6 +92,8 @@
           'interface/wave_trans_recv.h',
           'interface/wave_trans_send.c',
           'interface/wave_trans_send.h',
+          'audio_codec/pcm_to_wav.c',
+          'audio_codec/pcm_to_wav.h',
         ],
       }, # target libwavetrans
       {

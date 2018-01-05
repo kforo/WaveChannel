@@ -13,13 +13,6 @@ typedef struct {
 }WTSendPhyForMixHander;
 
 typedef struct {
-  void          *buff_;
-  int           buff_len_;
-  int           sample_rate_;
-  int           sample_bit_;
-}WTSendPcmBuffType;
-
-typedef struct {
   int           sample_rate_;
   int           sample_bit_;
 }WTSendPhyHanderAttr;

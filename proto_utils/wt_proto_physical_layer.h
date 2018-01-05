@@ -6,6 +6,13 @@
 
 typedef unsigned char WTPhyFreqMarkType;
 
+typedef struct {
+  void          *buff_;
+  int           buff_len_;
+  int           sample_rate_;
+  int           sample_bit_;
+}WTSendPcmBuffType;
+
 
 typedef struct {
   unsigned char                   freq_mark_num_;
