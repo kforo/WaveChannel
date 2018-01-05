@@ -39,12 +39,21 @@ int PcmToWavGetWavData(const WTSendPcmBuffType * pcm_buff, void * wav_buf, int w
   }
   HeadChunk head_chunk;
   
-  strcpy(head_chunk.chunk_id_, "RIFF");
+  head_chunk.chunk_id_[0] = 'R';
+  head_chunk.chunk_id_[1] = 'I';
+  head_chunk.chunk_id_[2] = 'F';
+  head_chunk.chunk_id_[3] = 'F';
   head_chunk.chunk_size_ = wav_size - 8;
-  strcpy(head_chunk.wave_form_data_, "WAVE");
+  head_chunk.wave_form_data_[0] = 'W';
+  head_chunk.wave_form_data_[1] = 'A';
+  head_chunk.wave_form_data_[2] = 'V';
+  head_chunk.wave_form_data_[3] = 'E';
   
   FormatChunk format_chunk;
-  strcpy(format_chunk.chunk_id_, "fmt ");
+  format_chunk.chunk_id_[0] = 'f';
+  format_chunk.chunk_id_[1] = 'm';
+  format_chunk.chunk_id_[2] = 't';
+  format_chunk.chunk_id_[3] = ' ';
   format_chunk.chunk_size_ = sizeof(FormatChunk) - 4 - sizeof(unsigned int);
   format_chunk.format_tag_ = 1;
   format_chunk.channels_ = 1;
@@ -54,7 +63,10 @@ int PcmToWavGetWavData(const WTSendPcmBuffType * pcm_buff, void * wav_buf, int w
   format_chunk.avg_bytes_per_sec_ = format_chunk.block_align_*format_chunk.sample_rate_;
 
   DataChunk data_chunk;
-  strcpy(data_chunk.chunk_id_, "data");
+  data_chunk.chunk_id_[0] = 'd';
+  data_chunk.chunk_id_[1] = 'a';
+  data_chunk.chunk_id_[2] = 't';
+  data_chunk.chunk_id_[3] = 'a';
   data_chunk.chunk_size_ = pcm_buff->buff_len_;
   int buff_w_addr = 0;
   memcpy(((unsigned char*)wav_buf + buff_w_addr), &head_chunk, sizeof(HeadChunk));
