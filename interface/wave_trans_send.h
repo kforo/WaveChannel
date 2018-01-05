@@ -21,11 +21,19 @@ typedef struct {
   int             sample_bit_;
 }WaveTransPcmInfo;
 
+typedef struct {
+  void            *wav_buff_;
+  int             buff_len_;
+}WaveTransWavInfo;
+
 WaveTransSendHander *WaveTransSendCreateHander(WaveTransSendAttr *attr);
 
 void WaveTransSendDestroyHander(WaveTransSendHander *hander);
 
 WaveTransPcmInfo *WaveTransSendGetPcm(WaveTransSendHander *hander,const void *context, int context_len);
+
+WaveTransWavInfo *WaveTransSendGetWav(WaveTransSendHander *hander, const void *context, int context_len);
+
 
 
 #ifdef __cplusplus

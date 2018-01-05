@@ -6,6 +6,13 @@
 
 typedef unsigned char WTPhyFreqMarkType;
 
+typedef struct {
+  void          *buff_;
+  int           buff_len_;
+  int           sample_rate_;
+  int           sample_bit_;
+}WTSendPcmBuffType;
+
 
 int WTPhysicalPcmToFreqMark(const RecvAudioType *pcm_buf, int pcm_len, WTPhyFreqMarkType *freq_mark);
 
