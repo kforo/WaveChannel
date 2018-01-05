@@ -212,7 +212,7 @@ WaveTransWavInfo * GetWavNoMix(WaveTransSendHander * hander, const void * contex
   }
   int wav_len = PcmToWavGetWavSize(pcm_type);
   hander_data->wav_info_.wav_buff_ = malloc(wav_len);
-  if (hander_data->pcm_info_.pcm_buff_ == NULL) {
+  if (hander_data->wav_info_.wav_buff_ == NULL) {
     WTSendPhyLayerReleasePcm(hander_data->phy_hander_);
     WTSendLinkLayerReleasePackage(hander_data->link_hander_);
     return NULL;
