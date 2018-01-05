@@ -9,7 +9,7 @@ int main(void)
 {
   int ret;
   FILE *fp = NULL;
-  char test_context[] = "'Z\ng'Z~\n_Z'~:~$$$Z,$Z$$55\n3\\J05$?55\n1515036821220\nipc\n88888888\r\n\r\n";
+  char test_context[] = "1234567890abcdefghijklmnopqrstuvwxyz";
   WaveTransSendHander *wt_send_hander = NULL;
   WaveTransSendAttr attr;
   attr.sample_bit_ = 16;

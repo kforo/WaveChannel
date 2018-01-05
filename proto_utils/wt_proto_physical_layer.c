@@ -9,7 +9,7 @@
 typedef struct {
   unsigned char           freq_num_;
   int                     freqs_[MIXING_FREQ_NUM];
-}MixingFreqInfo;
+}MixingFreqsInfo;
 
 typedef struct {
   long        item_;
@@ -81,7 +81,7 @@ error_exit:
   return -1;
 }
 
-static void GetFreqsFromCpx(int nfft, const kiss_fft_cpx *result, MixingFreqInfo *freqs_info, int threshold)
+static void GetFreqsFromCpx(int nfft, const kiss_fft_cpx *result, MixingFreqsInfo *freqs_info, int threshold)
 {
   FFTAnalysisSt *diff_data = NULL;
   int find_left = ((MIN_FREQ - (2 * MAX_FREQ_MISTAKE))*nfft) / RECV_SAMPLE_RATE;
@@ -140,7 +140,7 @@ static void GetFreqsFromCpx(int nfft, const kiss_fft_cpx *result, MixingFreqInfo
   free(diff_data);
 }
 
-static int GetPcmFreqs(const RecvAudioType *pcm_buf, int len, int threshold, MixingFreqInfo *freqs_info)
+static int GetPcmFreqs(const RecvAudioType *pcm_buf, int len, int threshold, MixingFreqsInfo *freqs_info)
 {
   kiss_fft_cpx *in_data = NULL;
   kiss_fft_cpx *out_data = NULL;
@@ -235,7 +235,7 @@ static int FreqMarkToFreq(WTPhyFreqMarkType freq_mark, int *freq)
   return -1;
 }
 
-static void CreatePluralForFreqs(int nfft,const MixingFreqInfo *freqs_info, kiss_fft_cpx *plural_data,int sample_rate,int amplitude)
+static void CreatePluralForFreqs(int nfft,const MixingFreqsInfo *freqs_info, kiss_fft_cpx *plural_data,int sample_rate,int amplitude)
 {
   //memset(plural_data, 0, sizeof(kiss_fft_cpx)*((nfft / 2) + 1));
   memset(plural_data, 0, sizeof(kiss_fft_cpx)*nfft);
@@ -253,7 +253,7 @@ static void CreatePluralForFreqs(int nfft,const MixingFreqInfo *freqs_info, kiss
   }
 }
 
-static int EncodeSoundMixing(const MixingFreqInfo *freqs_info, void *buffer, int buffer_length, int sample_bit, int sample_rate)
+static int EncodeSoundMixing(const MixingFreqsInfo *freqs_info, void *buffer, int buffer_length, int sample_bit, int sample_rate)
 {
   kiss_fftr_cfg fftr_cfg = NULL;
   kiss_fft_cpx *in_data = NULL;
@@ -365,10 +365,10 @@ int WTPhysicalFreqMarkToPcm(WTPhyFreqMarkType freq_mark, void  *pcm_buf, int pcm
   return 0;
 }
 
-int WTPhysicalPcmToFreqMarks(const RecvAudioType * pcm_buf, int pcm_len, WaveTransMixFreqMark * freq_marks)
+int WTPhysicalPcmToFreqMarks(const RecvAudioType * pcm_buf, int pcm_len, WaveTransMixMarksType * freq_marks)
 {
   int threshold = 550;
-  MixingFreqInfo freq_info;
+  MixingFreqsInfo freq_info;
   if (GetPcmFreqs(pcm_buf, pcm_len, threshold, &freq_info) != 0) {
     return -1;
   }
@@ -385,9 +385,9 @@ int WTPhysicalPcmToFreqMarks(const RecvAudioType * pcm_buf, int pcm_len, WaveTra
   return 0;
 }
 
-int WTPhysicalFreqMarksToPcm(const WaveTransMixFreqMark * freq_marks, void * pcm_buf, int pcm_len, int sample_bit, int sample_rate)
+int WTPhysicalFreqMarksToPcm(const WaveTransMixMarksType * freq_marks, void * pcm_buf, int pcm_len, int sample_bit, int sample_rate)
 {
-  MixingFreqInfo freq_info;
+  MixingFreqsInfo freq_info;
   int i;
   freq_info.freq_num_ = freq_marks->freq_mark_num_;
   for (i = 0; i < freq_marks->freq_mark_num_; i++) {

@@ -47,7 +47,7 @@ void WTSendPhyLayerDestroyHander(WTSendPhyHander * hander)
 
 WTSendPcmBuffType * WTSendPhyLayerGetPcm(WTSendPhyHander *hander, WTSendLinkPackageS *packages)
 {
-  int one_package_size = sizeof(WaveTransPackageHalf) / sizeof(WTPhyFreqMarkType);
+  int one_package_size = sizeof(WaveTransPhyPackage) / sizeof(WTPhyFreqMarkType);
   int mark_num = one_package_size * packages->package_num_;
   WTPhySendHanderData *hander_data = (WTPhySendHanderData *)hander->data_;
   hander_data->pcm_info_.buff_ = malloc((hander_data->sample_bit_ / 8)*WTGetPcmSize(mark_num, hander_data->sample_rate_));
@@ -118,12 +118,12 @@ WTSendPcmBuffType * WTSendPhyLayerGetPcmMixing(WTSendPhyForMixHander * hander, W
   if (hander_data->pcm_info_.buff_ == NULL) {
     return NULL;
   }
-  WaveTransMixFreqMark *temp;
+  WaveTransMixMarksType *temp;
   int pcm_w_addr = 0;
   int i, j;
   int one_freq_pcm_size = WTGetPcmSize(1, hander_data->sample_rate_)*(hander_data->sample_bit_ / 8);
   for (i = 0; i < packages->package_num_; i++) {
-    temp = (WaveTransMixFreqMark *)(&packages->package_[i]);
+    temp = (WaveTransMixMarksType *)(&packages->package_[i]);
     for (j = 0; j < one_package_size; j++) {
       WTPhysicalFreqMarksToPcm(&temp[j], (unsigned char *)hander_data->pcm_info_.buff_ + pcm_w_addr,
         one_freq_pcm_size,hander_data->sample_bit_,hander_data->sample_rate_);

@@ -18,7 +18,7 @@ void WTRecvPhyLayerExitForMixing(void);
 
 void WTRecvPhyLayerSendPcmForMixing(const RecvAudioType *pcm, int pcm_len);
 
-int WTRecvPhuLayerGetDataForMixing(WaveTransMixFreqMark *data_buf, int buf_len);
+int WTRecvPhuLayerGetDataForMixing(WaveTransMixMarksType *data_buf, int buf_len);
 
 
 #endif

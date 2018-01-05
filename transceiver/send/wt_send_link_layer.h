@@ -13,13 +13,13 @@ typedef struct {
 
 typedef struct {
   int                     package_num_;
-  WaveTransPackageHalf    *package_;
+  WaveTransPhyPackage    *package_;
 }WTSendLinkPackageS;
 
 
 typedef struct {
   int                     package_num_;
-  WaveTransPackageMix     *package_;
+  WaveTransMixPhyPackage     *package_;
 }WTSendLinkMixPackageS;
 
 WTSendLinkHander * WTSendLinkLayerCreateHander(void);

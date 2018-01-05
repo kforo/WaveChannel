@@ -44,7 +44,7 @@ WTSendLinkPackageS * WTSendLinkLayerGetPackage(WTSendLinkHander * hander,const v
 {
   int package_num;
   int data_r_addr = 0;
-  WaveTransPackage one_package;
+  WaveTransLinkPackage one_package;
   int i;
   if (context_len % (HBYTE_DATA_NUM / 2) != 0) {
     package_num = context_len / (HBYTE_DATA_NUM / 2) + 1;
@@ -53,7 +53,7 @@ WTSendLinkPackageS * WTSendLinkLayerGetPackage(WTSendLinkHander * hander,const v
     package_num = context_len / (HBYTE_DATA_NUM / 2);
   }
   WTLinkSendHanderData *hander_data = (WTLinkSendHanderData *)hander->data_;
-  hander_data->packages_.package_ = (WaveTransPackageHalf *)malloc(sizeof(WaveTransPackageHalf)*package_num);
+  hander_data->packages_.package_ = (WaveTransPhyPackage *)malloc(sizeof(WaveTransPhyPackage)*package_num);
   if (hander_data->packages_.package_ == NULL) {
     return NULL;
   }
@@ -113,7 +113,7 @@ WTSendLinkMixPackageS * WTSendLinkLayerGetPackageForMix(WTSendLinkForMixHander *
 {
   int package_num;
   int data_r_addr = 0;
-  WaveTransPackageMux one_package;
+  WaveTransMixLinkPackage one_package;
   int i;
   if (context_len % MIXING_BYTE_DATA_NUM != 0) {
     package_num = context_len / MIXING_BYTE_DATA_NUM + 1;
@@ -122,7 +122,7 @@ WTSendLinkMixPackageS * WTSendLinkLayerGetPackageForMix(WTSendLinkForMixHander *
     package_num = context_len / MIXING_BYTE_DATA_NUM ;
   }
   WTLinkSendHanderDataForMix *hander_data = (WTLinkSendHanderDataForMix *)hander->data_;
-  hander_data->packages_.package_ = (WaveTransPackageMix *)malloc(sizeof(WaveTransPackageMix)*package_num);
+  hander_data->packages_.package_ = (WaveTransMixPhyPackage *)malloc(sizeof(WaveTransMixPhyPackage)*package_num);
   if (hander_data->packages_.package_ == NULL) {
     return NULL;
   }

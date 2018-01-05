@@ -27,7 +27,7 @@ typedef struct {
 }OldPhyMarkRef;
 
 typedef struct {
-  WaveTransMixFreqMark     phy_marks_;
+  WaveTransMixMarksType     phy_marks_;
   int                         marks_num_;
   int                         already_num_;
 }MixingPhyMarkRef;
@@ -74,7 +74,7 @@ static int GetNextData(WTPhyFreqMarkType *data)
   return -1;
 }
 
-static void MixFreqMarkFormat(WaveTransMixFreqMark *data)
+static void MixFreqMarkFormat(WaveTransMixMarksType *data)
 {
   WTPhyFreqMarkType temp;
   int i,j;
@@ -89,7 +89,7 @@ static void MixFreqMarkFormat(WaveTransMixFreqMark *data)
   }
 }
 
-static int CheckTwoWaveTransMixinfFreqMark(WaveTransMixFreqMark *data_left, WaveTransMixFreqMark *data_right)
+static int CheckTwoWaveTransMixinfFreqMark(WaveTransMixMarksType *data_left, WaveTransMixMarksType *data_right)
 {
   if (data_left->freq_mark_num_ != data_left->freq_mark_num_) {
     return 1;
@@ -103,12 +103,12 @@ static int CheckTwoWaveTransMixinfFreqMark(WaveTransMixFreqMark *data_left, Wave
   return 0;
 }
 
-static int GetNextDataMixing(WaveTransMixFreqMark *data)
+static int GetNextDataMixing(WaveTransMixMarksType *data)
 {
-  WaveTransMixFreqMark temp;
+  WaveTransMixMarksType temp;
   int ret;
   BUF_LOCK();
-  while ((ret = RingBuffReadData(ring_buff_mix_fd_, &temp, sizeof(WaveTransMixFreqMark))) != 0) {
+  while ((ret = RingBuffReadData(ring_buff_mix_fd_, &temp, sizeof(WaveTransMixMarksType))) != 0) {
     if (temp.freq_mark_num_ != MIXING_FREQ_NUM) {
       old_marks_ref_.already_num_ = 0;
       old_marks_ref_.marks_num_ = 0;
@@ -121,7 +121,7 @@ static int GetNextDataMixing(WaveTransMixFreqMark *data)
       old_marks_ref_.marks_num_++;
       int old_num = WTPhyAnalysisNumToRealNum(old_marks_ref_.marks_num_);
       if (old_num > old_marks_ref_.already_num_) {
-        memcpy(data, &temp, sizeof(WaveTransMixFreqMark));
+        memcpy(data, &temp, sizeof(WaveTransMixMarksType));
         old_marks_ref_.already_num_++;
         BUF_UNLOCK();
         return 0;
@@ -130,7 +130,7 @@ static int GetNextDataMixing(WaveTransMixFreqMark *data)
     else {
       old_marks_ref_.already_num_ = 0;
       old_marks_ref_.marks_num_ = 1;
-      memcpy(&old_marks_ref_.phy_marks_, &temp, sizeof(WaveTransMixFreqMark));
+      memcpy(&old_marks_ref_.phy_marks_, &temp, sizeof(WaveTransMixMarksType));
     }
   }
   BUF_UNLOCK();
@@ -252,7 +252,7 @@ void WTRecvPhyLayerExitForMixing(void)
 void WTRecvPhyLayerSendPcmForMixing(const RecvAudioType * pcm, int pcm_len)
 {
   int pcm_r_addr = 0;
-  WaveTransMixFreqMark mark;
+  WaveTransMixMarksType mark;
 
   if (mix_pcm_buf_w_addr_ != 0) {
     if (pcm_len < FREQ_ANA_BUF_SIZE - mix_pcm_buf_w_addr_) {
@@ -266,7 +266,7 @@ void WTRecvPhyLayerSendPcmForMixing(const RecvAudioType * pcm, int pcm_len)
     if (WTPhysicalPcmToFreqMarks(pcm_buf_mix_, FREQ_ANA_BUF_SIZE,&mark) == 0) {
       BUF_LOCK();
       //printf("%d %d %d %d \n", mark.marks_[0], mark.marks_[1], mark.marks_[2], mark.marks_[3]);
-      RingBuffWriteData(ring_buff_mix_fd_, &mark, sizeof(WaveTransMixFreqMark));
+      RingBuffWriteData(ring_buff_mix_fd_, &mark, sizeof(WaveTransMixMarksType));
       BUF_UNLOCK();
     }
     // printf(" %d ", mark);
@@ -280,7 +280,7 @@ void WTRecvPhyLayerSendPcmForMixing(const RecvAudioType * pcm, int pcm_len)
     pcm_r_addr += FREQ_ANA_BUF_SIZE;
     BUF_LOCK();
     //printf(" %d ", mark);
-    RingBuffWriteData(ring_buff_mix_fd_, &mark, sizeof(WaveTransMixFreqMark));
+    RingBuffWriteData(ring_buff_mix_fd_, &mark, sizeof(WaveTransMixMarksType));
     BUF_UNLOCK();
   }
 
@@ -290,7 +290,7 @@ void WTRecvPhyLayerSendPcmForMixing(const RecvAudioType * pcm, int pcm_len)
   }
 }
 
-int WTRecvPhuLayerGetDataForMixing(WaveTransMixFreqMark * data_buf, int buf_len)
+int WTRecvPhuLayerGetDataForMixing(WaveTransMixMarksType * data_buf, int buf_len)
 {
   int i;
   for (i = 0; i < buf_len; i++) {

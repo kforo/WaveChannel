@@ -6,14 +6,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-static WaveTransPackageHalf package_temp_;
+static WaveTransPhyPackage package_temp_;
 static int package_temp_addr_ = 0;
 
-static WaveTransPackageMix mux_package_temp_;
+static WaveTransMixPhyPackage mux_package_temp_;
 static int package_mux_addr_ = 0;
 
 
-static int GetNextPackage(WaveTransPackage *package)
+static int GetNextPackage(WaveTransLinkPackage *package)
 {
   int ret;
   if (package_temp_addr_ >= 0 && package_temp_addr_ < START_FREQ_NUM) {    //find package start mark
@@ -49,20 +49,20 @@ re_read_st: while((ret = WTRecvPhyLayerGetData(&package_temp_.st_mark_[package_t
   }
   /*check one package*/
   if (package_temp_addr_ == START_FREQ_NUM + HBYTE_DATA_NUM + HBYTE_CHECKSUM_NUM) {
-    WaveTransPackage temp;
+    WaveTransLinkPackage temp;
     WTLinkHalfPackageToByte(&package_temp_, &temp);
     if (WTLinkChecksumOk(&temp) != 1) {
       package_temp_addr_ = 0;
       return -1;
     }
-    memcpy(package, &temp, sizeof(WaveTransPackage));
+    memcpy(package, &temp, sizeof(WaveTransLinkPackage));
     package_temp_addr_ = 0;
     return 0;
   }
   return -1;
 }
 
-static int GetNextPackageMux(WaveTransPackageMux *package)
+static int GetNextPackageMux(WaveTransMixLinkPackage *package)
 {
   int ret;
   if (package_mux_addr_ >= 0 && package_mux_addr_ < MIXING_BYTE_ST_NUM) {    //find package start mark
@@ -98,13 +98,13 @@ static int GetNextPackageMux(WaveTransPackageMux *package)
   }
   /*check one package*/
   if (package_mux_addr_ == MIXING_BYTE_ST_NUM + MIXING_BYTE_DATA_NUM + MIXING_CHECKSUM_NUM) {
-    WaveTransPackageMux temp;
+    WaveTransMixLinkPackage temp;
     WTLinkMuxPackageToByte(&mux_package_temp_, &temp);
     if (WTLinkChecksumOkMux(&temp) != 1) {
       package_mux_addr_ = 0;
       return -1;
     }
-    memcpy(package, &temp, sizeof(WaveTransPackageMux));
+    memcpy(package, &temp, sizeof(WaveTransMixLinkPackage));
     package_mux_addr_ = 0;
     return 0;
   }
@@ -124,7 +124,7 @@ void WTRecvLinkLayerExit(void)
 
 int WTRecvLinkLayerGetData(void * buf, int buf_len)
 {
-  WaveTransPackage one_package;
+  WaveTransLinkPackage one_package;
   int buf_w_addr = 0;
   while (buf_len - buf_w_addr >= HBYTE_DATA_NUM / 2) {
     if (GetNextPackage(&one_package) != 0) {
@@ -149,7 +149,7 @@ void WTRecvLinkLayerExitForMix(void)
 
 int WTRecvLinkLayerGetDataForMix(void * buf, int buf_len)
 {
-  WaveTransPackageMux one_package;
+  WaveTransMixLinkPackage one_package;
   int buf_w_addr = 0;
   while (buf_len - buf_w_addr >= MIXING_BYTE_DATA_NUM) {
     if (GetNextPackageMux(&one_package) != 0) {
