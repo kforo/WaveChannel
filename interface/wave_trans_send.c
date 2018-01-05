@@ -16,6 +16,16 @@ typedef struct {
   WaveTransPcmInfo      pcm_info_;
 }WaveTransSendHanderData;
 
+
+typedef struct {
+  WTSendLinkForMixHander    *link_hander_;
+  WTSendPhyForMixHander     *phy_hander_;
+  WaveTransPcmInfo          pcm_info_;
+}WaveTransSendHanderDataForMix;
+
+
+
+
 static int WaveTransSendAttrCheck(WaveTransSendAttr *attr)
 {
   if (attr == NULL) {
@@ -68,34 +78,45 @@ static void WaveTransSendHanderDataExit(WaveTransSendHanderData *hander_data)
   free(hander_data);
 }
 
-
-
-WaveTransSendHander * WaveTransSendCreateHander(WaveTransSendAttr * attr)
+static WaveTransSendHanderDataForMix * WaveTransSendHanderDataInitForMix(WaveTransSendAttr *attr)
 {
-  if (WaveTransSendAttrCheck(attr) != 0) {
-    return NULL;
-  }
-  WaveTransSendHanderData *hander_data = WaveTransSendHanderDataInit(attr);
+  WaveTransSendHanderDataForMix *hander_data = (WaveTransSendHanderDataForMix *)malloc(sizeof(WaveTransSendHanderDataForMix));
   if (hander_data == NULL) {
     return NULL;
   }
-  WaveTransSendHander *hander = (WaveTransSendHander *)malloc(sizeof(WaveTransSendHander));
-  if (hander == NULL) {
-    WaveTransSendHanderDataExit(hander_data);
+  hander_data->link_hander_ = WTSendLinkLayerCreateHanderForMix();
+  if (hander_data->link_hander_ == NULL) {
+    free(hander_data);
     return NULL;
   }
-  hander->data_ = hander_data;
-  return hander;
+  WTSendPhyHanderAttr phy_attr;
+  phy_attr.sample_bit_ = attr->sample_bit_;
+  phy_attr.sample_rate_ = attr->sample_rate_;
+  hander_data->phy_hander_ = WTSendPhyLayerCreatHanderForMix(&phy_attr);
+  if (hander_data->phy_hander_ == NULL) {
+    WTSendLinkLayerDestroyHanderForMix(hander_data->link_hander_);
+    free(hander_data);
+    return NULL;
+  }
+  hander_data->pcm_info_.pcm_buff_ = NULL;
+  hander_data->pcm_info_.buff_len_ = 0;
+  return hander_data;
 }
 
-void WaveTransSendDestroyHander(WaveTransSendHander * hander)
+static void WaveTransSendHanderDataExitForMix(WaveTransSendHanderDataForMix *hander_data)
 {
-  WaveTransSendHanderData *hander_data = (WaveTransSendHanderData *)hander->data_;
-  WaveTransSendHanderDataExit(hander_data);
-  free(hander);
+  WTSendLinkLayerDestroyHanderForMix(hander_data->link_hander_);
+  hander_data->link_hander_ = NULL;
+  WTSendPhyLayerDestroyHanderForMix(hander_data->phy_hander_);
+  hander_data->link_hander_ = NULL;
+  if (hander_data->pcm_info_.pcm_buff_ != NULL) {
+    free(hander_data->pcm_info_.pcm_buff_);
+    hander_data->pcm_info_.pcm_buff_ = NULL;
+  }
+  free(hander_data);
 }
 
-WaveTransPcmInfo * WaveTransSendGetPcm(WaveTransSendHander *hander,const void * context, int context_len)
+static WaveTransPcmInfo * GetPcmNoMix(WaveTransSendHander *hander, const void * context, int context_len)
 {
   WaveTransSendHanderData *hander_data = (WaveTransSendHanderData *)hander->data_;
   WTSendLinkPackageS *packages = WTSendLinkLayerGetPackage(hander_data->link_hander_, context, context_len);
@@ -124,6 +145,85 @@ WaveTransPcmInfo * WaveTransSendGetPcm(WaveTransSendHander *hander,const void * 
   WTSendPhyLayerReleasePcm(hander_data->phy_hander_);
   WTSendLinkLayerReleasePackage(hander_data->link_hander_);
   return &hander_data->pcm_info_;
+}
+
+static WaveTransPcmInfo * GetPcmForMix(WaveTransSendHander *hander, const void * context, int context_len)
+{
+  WaveTransSendHanderDataForMix *hander_data = (WaveTransSendHanderDataForMix *)hander->data_;
+  WTSendLinkMixPackageS *packages = WTSendLinkLayerGetPackageForMix(hander_data->link_hander_, context, context_len);
+  if (packages == NULL) {
+    return NULL;
+  }
+  WTSendPcmBuffType *pcm_type = WTSendPhyLayerGetPcmMixing(hander_data->phy_hander_, packages);
+  if (pcm_type == NULL) {
+    WTSendLinkLayerReleasePackageForMix(hander_data->link_hander_);
+    return NULL;
+  }
+  if (hander_data->pcm_info_.pcm_buff_ != NULL) {
+    free(hander_data->pcm_info_.pcm_buff_);
+    hander_data->pcm_info_.pcm_buff_ = NULL;
+  }
+  hander_data->pcm_info_.pcm_buff_ = malloc(pcm_type->buff_len_);
+  if (hander_data->pcm_info_.pcm_buff_ == NULL) {
+    WTSendPhyLayerReleasePcmMixing(hander_data->phy_hander_);
+    WTSendLinkLayerReleasePackageForMix(hander_data->link_hander_);
+    return NULL;
+  }
+  memcpy(hander_data->pcm_info_.pcm_buff_, pcm_type->buff_, pcm_type->buff_len_);
+  hander_data->pcm_info_.buff_len_ = pcm_type->buff_len_;
+  hander_data->pcm_info_.sample_bit_ = pcm_type->sample_bit_;
+  hander_data->pcm_info_.sample_rate_ = pcm_type->sample_rate_;
+  WTSendPhyLayerReleasePcmMixing(hander_data->phy_hander_);
+  WTSendLinkLayerReleasePackageForMix(hander_data->link_hander_);
+  return &hander_data->pcm_info_;
+}
+
+
+WaveTransSendHander * WaveTransSendCreateHander(WaveTransSendAttr * attr)
+{
+  if (WaveTransSendAttrCheck(attr) != 0) {
+    return NULL;
+  }
+#ifdef FREQ_MODE_MUX
+  WaveTransSendHanderDataForMix *hander_data = WaveTransSendHanderDataInitForMix(attr);
+#else
+  WaveTransSendHanderData *hander_data = WaveTransSendHanderDataInit(attr);
+#endif
+  if (hander_data == NULL) {
+    return NULL;
+  }
+  WaveTransSendHander *hander = (WaveTransSendHander *)malloc(sizeof(WaveTransSendHander));
+  if (hander == NULL) {
+#ifdef FREQ_MODE_MUX
+    WaveTransSendHanderDataExitForMix(hander_data);
+#else
+    WaveTransSendHanderDataExit(hander_data);
+#endif
+    return NULL;
+  }
+  hander->data_ = hander_data;
+  return hander;
+}
+
+void WaveTransSendDestroyHander(WaveTransSendHander * hander)
+{
+#ifdef FREQ_MODE_MUX
+  WaveTransSendHanderDataForMix *hander_data = (WaveTransSendHanderDataForMix *)hander->data_;
+  WaveTransSendHanderDataExitForMix(hander_data);
+#else
+  WaveTransSendHanderData *hander_data = (WaveTransSendHanderData *)hander->data_;
+  WaveTransSendHanderDataExit(hander_data);
+#endif
+  free(hander);
+}
+
+WaveTransPcmInfo * WaveTransSendGetPcm(WaveTransSendHander *hander,const void * context, int context_len)
+{
+#ifdef FREQ_MODE_MUX
+  return GetPcmForMix(hander, context, context_len);
+#else
+  return GetPcmNoMix(hander, context, context_len);
+#endif
 }
 
 

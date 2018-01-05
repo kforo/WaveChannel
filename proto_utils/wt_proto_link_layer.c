@@ -10,6 +10,11 @@ static WaveTransMixFreqMark proto_st_mark_mux_ = {
   {0,3,16,17},
 };
 
+static WaveTransMixFreqMark proto_none_mark_mux_ = {
+  4,
+  { 0,2,16,17 },
+};
+
 static WaveTransPackageHalf package_temp;
 static int package_temp_addr_ = 0;
 
@@ -21,25 +26,65 @@ static void SetPackageStMark(WTPhyFreqMarkType *mark_data)
   }
 }
 
-static int CheckIsNoneMarks(WaveTransMixFreqMark *marks)
+static void SetPackageStMarkForMix(WaveTransMixFreqMark *marks_data)
 {
-
+  int i;
+  for (i = 0; i < MIXING_BYTE_ST_NUM; i++) {
+    memcpy(&marks_data[i], &proto_st_mark_mux_, sizeof(WaveTransMixFreqMark));
+  }
 }
 
-static unsigned char GetByteDataFromPackage(WaveTransMixFreqMark *marks)
+static int MixCheckIsNoneMarks(WaveTransMixFreqMark *marks)
+{
+  if (marks->freq_mark_num_ != proto_none_mark_mux_.freq_mark_num_) {
+    return 0;
+  }
+  int i;
+  for (i = 0; i < marks->freq_mark_num_; i++) {
+    if (marks->marks_[i] != proto_none_mark_mux_.marks_[i]) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+static void MixSetNoneMarks(WaveTransMixFreqMark *marks)
+{
+  memcpy(marks, &proto_none_mark_mux_, sizeof(WaveTransMixFreqMark));
+}
+
+static unsigned char GetByteDataFromPackage(const WaveTransMixFreqMark *marks)
 {
   int i;
   unsigned char data = 0;
   for (i = 0; i < MIXING_FREQ_NUM; i++) {
-    data += (marks->marks_[i] & 0x0003)<<(i*2);
+    data += (marks->marks_[i] & 0x03)<<(i*2);
   }
   return data;
+}
+
+static void SetMixDataForPackage(unsigned char in_data, WaveTransMixFreqMark *out_marks)
+{
+  out_marks->freq_mark_num_ = MIXING_FREQ_NUM;
+  memset(out_marks->marks_, 0, sizeof(WTPhyFreqMarkType)*out_marks->freq_mark_num_);
+  int i;
+  for (i = 0; i < out_marks->freq_mark_num_; i++) {
+    out_marks->marks_[i] = (in_data >> (i * 2)) & 0x03;
+    out_marks->marks_[i] += ((unsigned char)i) << 2;
+  }
 }
 
 void WTLinkGetDataChecksum(WaveTransPackage *package)
 {
   package->check_sum_ = crc_16(package->byte_data_, package->real_data_num_);
 }
+
+void WTLinkGetDataChecksumMix(WaveTransPackageMux * package)
+{
+  package->check_sum_ = crc_16(package->byte_data_, package->real_data_num_);
+}
+
+
 
 void WTLinkPackageToHalf(const WaveTransPackage * package, WaveTransPackageHalf * half_package)
 {
@@ -61,6 +106,23 @@ void WTLinkPackageToHalf(const WaveTransPackage * package, WaveTransPackageHalf 
     half_package->check_half_byte_data_[j] = temp[i] & 0x0f;
     half_package->check_half_byte_data_[j + 1] = (temp[i] & 0xf0) >> 4;
     j += 2;
+  }
+}
+
+void WTLinkPackageToMixPackage(const WaveTransPackageMux * package, WaveTransPackageMix * mix_package)
+{
+  SetPackageStMarkForMix(mix_package->st_mark_);
+  int i, j = 0;
+  for (i = 0; i < package->real_data_num_; i++) {
+    SetMixDataForPackage(package->byte_data_[i], &mix_package->byte_data_[i]);
+  }
+  for (; i < MIXING_BYTE_DATA_NUM; i++) {
+    MixSetNoneMarks(&mix_package->byte_data_[i]);
+  }
+  j = 0;
+  unsigned char *temp = (unsigned char *)(&package->check_sum_);
+  for (i = 0; i < MIXING_CHECKSUM_NUM; i++) {
+    SetMixDataForPackage(temp[i], &mix_package->check_byte_data_[i]);
   }
 }
 
@@ -94,13 +156,13 @@ void WTLinkMuxPackageToByte(WaveTransPackageMix * mux_package, WaveTransPackageM
   int i, j = 0;
   package->real_data_num_ = 0;
   for (i = 0; i < MIXING_BYTE_DATA_NUM; i++) {
-    if (CheckIsNoneMarks(&mux_package->check_byte_data_[i] == 1)){
+    if (MixCheckIsNoneMarks(&mux_package->byte_data_[i])==1){
       break;
     }
     package->byte_data_[package->real_data_num_] = GetByteDataFromPackage(&mux_package->byte_data_[i]);
     package->real_data_num_++;
   }
-  unsigned char *temp = &package->check_sum_;
+  unsigned char *temp = (unsigned char *)(&package->check_sum_);
   for (i = 0; i < MIXING_CHECKSUM_NUM; i++) {
     temp[i] = GetByteDataFromPackage(&mux_package->check_byte_data_[i]);
   }

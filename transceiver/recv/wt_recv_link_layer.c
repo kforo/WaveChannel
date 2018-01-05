@@ -149,7 +149,7 @@ void WTRecvLinkLayerExitForMix(void)
 
 int WTRecvLinkLayerGetDataForMix(void * buf, int buf_len)
 {
-  WaveTransPackage one_package;
+  WaveTransPackageMux one_package;
   int buf_w_addr = 0;
   while (buf_len - buf_w_addr >= MIXING_BYTE_DATA_NUM) {
     if (GetNextPackageMux(&one_package) != 0) {

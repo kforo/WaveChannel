@@ -44,7 +44,11 @@ int WTLinkChecksumOkMux(WaveTransPackageMux *package);
 
 void WTLinkGetDataChecksum(WaveTransPackage *package);
 
+void WTLinkGetDataChecksumMix(WaveTransPackageMux *package);
+
 void WTLinkPackageToHalf(const WaveTransPackage * package, WaveTransPackageHalf * half_package);
+
+void WTLinkPackageToMixPackage(const WaveTransPackageMux *package, WaveTransPackageMix *mix_package);
 
 
 #endif

@@ -267,6 +267,7 @@ static int EncodeSoundMixing(const MixingFreqInfo *freqs_info, void *buffer, int
   in_data = (kiss_fft_cpx *)malloc(sizeof(kiss_fft_cpx)*in_data_num);
   if (in_data == NULL) {
     KISS_FFT_FREE(fftr_cfg);
+    return -1;
   }
   int amplitude;
   switch (sample_bit) {

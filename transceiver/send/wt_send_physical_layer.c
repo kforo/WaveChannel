@@ -91,6 +91,7 @@ WTSendPhyForMixHander * WTSendPhyLayerCreatHanderForMix(WTSendPhyHanderAttr * at
     return NULL;
   }
   hander_data->pcm_info_.buff_ = NULL;
+  hander_data->pcm_info_.buff_len_ = 0;
   hander_data->sample_bit_ = attr->sample_bit_;
   hander_data->sample_rate_ = attr->sample_rate_;
   hander->data_ = hander_data;
@@ -111,9 +112,9 @@ void WTSendPhyLayerDestroyHanderForMix(WTSendPhyForMixHander * hander)
 WTSendPcmBuffType * WTSendPhyLayerGetPcmMixing(WTSendPhyForMixHander * hander, WTSendLinkMixPackageS * packages)
 {
   int one_package_size = MIXING_BYTE_ST_NUM+ MIXING_BYTE_DATA_NUM+ MIXING_CHECKSUM_NUM;
-  int mark_num = one_package_size * packages->package_num_;
+  int marks_num = one_package_size * packages->package_num_;
   WTPhySendHanderData *hander_data = (WTPhySendHanderData *)hander->data_;
-  hander_data->pcm_info_.buff_ = malloc((hander_data->sample_bit_ / 8)*WTGetPcmSize(mark_num, hander_data->sample_rate_));
+  hander_data->pcm_info_.buff_ = malloc((hander_data->sample_bit_ / 8)*WTGetPcmSize(marks_num, hander_data->sample_rate_));
   if (hander_data->pcm_info_.buff_ == NULL) {
     return NULL;
   }
@@ -129,7 +130,7 @@ WTSendPcmBuffType * WTSendPhyLayerGetPcmMixing(WTSendPhyForMixHander * hander, W
       pcm_w_addr += one_freq_pcm_size;
     }
   }
-  hander_data->pcm_info_.buff_len_ = (hander_data->sample_bit_ / 8)*WTGetPcmSize(mark_num, hander_data->sample_rate_);
+  hander_data->pcm_info_.buff_len_ = (hander_data->sample_bit_ / 8)*WTGetPcmSize(marks_num, hander_data->sample_rate_);
   hander_data->pcm_info_.sample_bit_ = hander_data->sample_bit_;
   hander_data->pcm_info_.sample_rate_ = hander_data->sample_rate_;
   return &hander_data->pcm_info_;

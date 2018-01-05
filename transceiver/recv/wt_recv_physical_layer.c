@@ -74,16 +74,19 @@ static int GetNextData(WTPhyFreqMarkType *data)
   return -1;
 }
 
-static void MixinfFreqMarkFormat(WaveTransMixFreqMark *data)
+static void MixFreqMarkFormat(WaveTransMixFreqMark *data)
 {
-  WaveTransMixFreqMark temp;
-  int i;
-  temp.freq_mark_num_ = 0;
+  WTPhyFreqMarkType temp;
+  int i,j;
   for (i = 0; i < data->freq_mark_num_; i++) {
-    temp.marks_[data->marks_[i] / MIXING_MARK_PROGRESSIVE] = data->marks_[i];
-    temp.freq_mark_num_++;
+    for (j = 1; j < data->freq_mark_num_ - i; j++) {
+      if (data->marks_[j] < data->marks_[j-1]) {
+        temp = data->marks_[j];
+        data->marks_[j] = data->marks_[j - 1];
+        data->marks_[j - 1] = temp;
+      }
+    }
   }
-  memcpy(data, &temp, sizeof(WaveTransMixFreqMark));
 }
 
 static int CheckTwoWaveTransMixinfFreqMark(WaveTransMixFreqMark *data_left, WaveTransMixFreqMark *data_right)
@@ -112,7 +115,7 @@ static int GetNextDataMixing(WaveTransMixFreqMark *data)
       old_marks_ref_.phy_marks_.marks_[0] = REF_MARK_INIT_DATA;
       continue;
     }
-    MixinfFreqMarkFormat(&temp);
+    MixFreqMarkFormat(&temp);
     ret = CheckTwoWaveTransMixinfFreqMark(&temp, &old_marks_ref_.phy_marks_);
     if (ret == 0) {
       old_marks_ref_.marks_num_++;
@@ -221,7 +224,7 @@ int WTRecvPhyLayerInitForMixing(void)
   BUF_LOCK_INIT();
   old_marks_ref_.already_num_ = 0;
   old_marks_ref_.marks_num_ = 0;
-  old_marks_ref_.phy_marks_.freq_mark_num_ = 0;
+  old_marks_ref_.phy_marks_.freq_mark_num_ = 4;
   int i;
   for (i = 0; i < old_marks_ref_.phy_marks_.freq_mark_num_; i++) {
     old_marks_ref_.phy_marks_.marks_[i] = REF_MARK_INIT_DATA;
@@ -262,7 +265,7 @@ void WTRecvPhyLayerSendPcmForMixing(const RecvAudioType * pcm, int pcm_len)
     mix_pcm_buf_w_addr_ = 0;
     if (WTPhysicalPcmToFreqMarks(pcm_buf_mix_, FREQ_ANA_BUF_SIZE,&mark) == 0) {
       BUF_LOCK();
-      //printf(" %d ", mark);
+      //printf("%d %d %d %d \n", mark.marks_[0], mark.marks_[1], mark.marks_[2], mark.marks_[3]);
       RingBuffWriteData(ring_buff_mix_fd_, &mark, sizeof(WaveTransMixFreqMark));
       BUF_UNLOCK();
     }
@@ -273,6 +276,7 @@ void WTRecvPhyLayerSendPcmForMixing(const RecvAudioType * pcm, int pcm_len)
       pcm_r_addr += FREQ_ANA_BUF_SIZE;
       continue;
     }
+    //printf("%d %d %d %d \n", mark.marks_[0], mark.marks_[1], mark.marks_[2], mark.marks_[3]);
     pcm_r_addr += FREQ_ANA_BUF_SIZE;
     BUF_LOCK();
     //printf(" %d ", mark);
