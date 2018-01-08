@@ -9,7 +9,7 @@ typedef struct {
   WTPhyFreqMarkType     mark_;
 }FreqAsMark;
 
-static FreqAsMark freq_to_mark_list_[] = {
+static const FreqAsMark freq_to_mark_list_[] = {
   { 1765,0 },
   { 1986,1 },
   { 2211,2 },
