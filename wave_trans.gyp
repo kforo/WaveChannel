@@ -57,6 +57,9 @@
           'include_dirs': [
             '.',       
            ],
+           'ldflags': [
+            '-lstdc++',
+           ],
         },
         'sources': [
           'buff_utils/queue.c',
