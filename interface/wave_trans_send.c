@@ -242,27 +242,43 @@ WaveTransWavInfo * GetWavForMix(WaveTransSendHander * hander, const void * conte
     WTSendLinkLayerReleasePackageForMix(hander_data->link_hander_);
     return NULL;
   }
+  int none_len = AUDIO_NONE_LEN(pcm_type->sample_rate_)*(pcm_type->sample_bit_ / 8);
+  int out_pcm_len = 2 * none_len + pcm_type->buff_len_;
+  WTSendPcmBuffType temp_pcm_type;
+  temp_pcm_type.buff_ = malloc(out_pcm_len);
+  if (temp_pcm_type.buff_ == NULL) {
+    WTSendPhyLayerReleasePcmMixing(hander_data->phy_hander_);
+    WTSendLinkLayerReleasePackageForMix(hander_data->link_hander_);
+    return NULL;
+  }
+  memset(temp_pcm_type.buff_, 0, none_len);
+  memcpy(((unsigned char *)temp_pcm_type.buff_ + none_len), pcm_type->buff_, pcm_type->buff_len_);
+  memset(((unsigned char *)temp_pcm_type.buff_ + none_len + pcm_type->buff_len_), 0, none_len);
+  temp_pcm_type.buff_len_ = out_pcm_len;
+  temp_pcm_type.sample_bit_ = pcm_type->sample_bit_;
+  temp_pcm_type.sample_rate_ = pcm_type->sample_rate_;
+  WTSendPhyLayerReleasePcmMixing(hander_data->phy_hander_);
+  WTSendLinkLayerReleasePackageForMix(hander_data->link_hander_);
+
+
   if (hander_data->wav_info_.wav_buff_ != NULL) {
     free(hander_data->wav_info_.wav_buff_);
     hander_data->wav_info_.wav_buff_ = NULL;
   }
-  int wav_len = PcmToWavGetWavSize(pcm_type);
+  int wav_len = PcmToWavGetWavSize(&temp_pcm_type);
   hander_data->wav_info_.wav_buff_ = malloc(wav_len);
   if (hander_data->wav_info_.wav_buff_ == NULL) {
-    WTSendPhyLayerReleasePcmMixing(hander_data->phy_hander_);
-    WTSendLinkLayerReleasePackageForMix(hander_data->link_hander_);
+    free(temp_pcm_type.buff_);
     return NULL;
   }
   hander_data->wav_info_.buff_len_ = wav_len;
-  if (PcmToWavGetWavData(pcm_type, hander_data->wav_info_.wav_buff_, hander_data->wav_info_.buff_len_) != 0) {
+  if (PcmToWavGetWavData(&temp_pcm_type, hander_data->wav_info_.wav_buff_, hander_data->wav_info_.buff_len_) != 0) {
     free(hander_data->wav_info_.wav_buff_);
     hander_data->wav_info_.wav_buff_ = NULL;
-    WTSendPhyLayerReleasePcmMixing(hander_data->phy_hander_);
-    WTSendLinkLayerReleasePackageForMix(hander_data->link_hander_);
+    free(temp_pcm_type.buff_);
     return NULL;
   }
-  WTSendPhyLayerReleasePcmMixing(hander_data->phy_hander_);
-  WTSendLinkLayerReleasePackageForMix(hander_data->link_hander_);
+  free(temp_pcm_type.buff_);
   return &hander_data->wav_info_;
 }
 
