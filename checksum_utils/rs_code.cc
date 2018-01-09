@@ -335,7 +335,7 @@ void encode_rs_char(RS *rs, const data_t *data, data_t *parity)
   }
 }
 
-
+#include <memory>
 
 int decode_rs_char(RS *rs, unsigned char *data, int *eras_pos, int no_eras) {
     
@@ -345,10 +345,14 @@ int decode_rs_char(RS *rs, unsigned char *data, int *eras_pos, int no_eras) {
         int deg_lambda, el, deg_omega;
         int i, j, r,k;
         data_t u,q,tmp,num1,num2,den,discr_r;
-        data_t lambda[NROOTS+1], s[NROOTS];	/* Err+Eras Locator poly
-                                             * and syndrome poly */
-        data_t b[NROOTS+1], t[NROOTS+1], omega[NROOTS+1];
-        data_t root[NROOTS], reg[NROOTS+1], loc[NROOTS];
+        std::unique_ptr<data_t[]> s(new data_t[NROOTS]);
+        std::unique_ptr<data_t[]> lambda(new data_t[NROOTS + 1]);
+        std::unique_ptr<data_t[]> b(new data_t[NROOTS + 1]);
+        std::unique_ptr<data_t[]> t(new data_t[NROOTS + 1]);
+        std::unique_ptr<data_t[]> omega(new data_t[NROOTS + 1]);
+        std::unique_ptr<data_t[]> root(new data_t[NROOTS ]);
+        std::unique_ptr<data_t[]> reg(new data_t[NROOTS + 1]);
+        std::unique_ptr<data_t[]> loc(new data_t[NROOTS]);
         int syn_error, count;
         
         /* form the syndromes; i.e., evaluate data(x) at roots of g(x) */
@@ -462,7 +466,7 @@ int decode_rs_char(RS *rs, unsigned char *data, int *eras_pos, int no_eras) {
             discr_r = INDEX_OF[discr_r];	/* Index form */
             if (discr_r == A0) {
                 /* 2 lines below: B(x) <-- x*B(x) */
-                memmove(&b[1],b,NROOTS*sizeof(b[0]));
+                memmove(&b[1],&b[0],NROOTS*sizeof(b[0]));
                 b[0] = A0;
             } else {
                 /* 7 lines below: T(x) <-- lambda(x) - discr_r*x*b(x) */
@@ -483,10 +487,10 @@ int decode_rs_char(RS *rs, unsigned char *data, int *eras_pos, int no_eras) {
                         b[i] = (lambda[i] == 0) ? A0 : MODNN(INDEX_OF[lambda[i]] - discr_r + NN);
                 } else {
                     /* 2 lines below: B(x) <-- x*B(x) */
-                    memmove(&b[1],b,NROOTS*sizeof(b[0]));
+                    memmove(&b[1],&b[0],NROOTS*sizeof(b[0]));
                     b[0] = A0;
                 }
-                memcpy(lambda,t,(NROOTS+1)*sizeof(t[0]));
+                memcpy(&lambda[0],&t[0],(NROOTS+1)*sizeof(t[0]));
             }
         }
         
