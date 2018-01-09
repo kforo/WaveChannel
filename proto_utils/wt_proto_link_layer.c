@@ -1,7 +1,13 @@
 #include "wt_proto_link_layer.h"
 #include "checksum_utils/crc_codec.h"
+#include "checksum_utils/rs_code.h"
 #include <stdlib.h>
 #include <string.h>
+
+#define RS_SYMSIZE			8
+#define RS_GFPOLY			0x11d
+#define RS_FCR				1
+#define RS_PRIM				1
 
 static WTPhyFreqMarkType proto_st_mark_[START_FREQ_NUM] = START_FREQ_MARK;
 
@@ -81,9 +87,14 @@ void WTLinkGetDataChecksum(WaveTransLinkPackage *package)
 
 void WTLinkGetDataChecksumMix(WaveTransMixLinkPackage * package)
 {
-  package->check_sum_ = crc_16(package->byte_data_, package->real_data_num_);
+  void *rs_hander = NULL;
+  rs_hander = init_rs(RS_SYMSIZE, RS_GFPOLY, RS_FCR, RS_PRIM, MIXING_CHECKSUM_NUM, ((1 << RS_SYMSIZE) - 1 - (package->real_data_num_ + MIXING_CHECKSUM_NUM)));
+  if (rs_hander == NULL) {
+    return;
+  }
+  encode_rs_char(rs_hander, (data_t *)package->byte_data_, (data_t *)(&package->check_sum_));
+  free_rs_cache();
 }
-
 
 
 void WTLinkPackageToHalf(const WaveTransLinkPackage * package, WaveTransPhyPackage * half_package)
@@ -201,9 +212,18 @@ int WTLinkChecksumOk(WaveTransLinkPackage * package)
 
 int WTLinkChecksumOkMux(WaveTransMixLinkPackage * package)
 {
-  unsigned short package_checksum = crc_16(package->byte_data_, package->real_data_num_);
-  if (package_checksum != package->check_sum_) {
-    return 0;
+  void *rs_hander = NULL;
+  int eras_pos[MIXING_BYTE_DATA_NUM + MIXING_CHECKSUM_NUM];
+  unsigned char buff[MIXING_BYTE_DATA_NUM + MIXING_CHECKSUM_NUM] = { 0 };
+  memset(eras_pos, 0, sizeof(int)*MIXING_BYTE_DATA_NUM + MIXING_CHECKSUM_NUM);
+  rs_hander = init_rs(RS_SYMSIZE, RS_GFPOLY, RS_FCR, RS_PRIM, MIXING_CHECKSUM_NUM, ((1 << RS_SYMSIZE) - 1 - (package->real_data_num_ + MIXING_CHECKSUM_NUM)));
+  if (rs_hander == NULL) {
+    return 1;
   }
+  memcpy(buff, package->byte_data_, package->real_data_num_);
+  memcpy(buff + package->real_data_num_, &package->check_sum_, MIXING_CHECKSUM_NUM);
+  decode_rs_char(rs_hander, buff, eras_pos, 0);
+  memcpy(package->byte_data_, buff, package->real_data_num_);
+  free_rs_cache();
   return 1;
 }

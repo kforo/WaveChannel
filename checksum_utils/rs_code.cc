@@ -33,7 +33,7 @@
 #ifdef HAVE_LIBPTHREAD
 #  include <pthread.h>
 #endif
-
+#include <memory>
 #ifndef NULL
 # define NULL 			((void *)0)
 #endif
@@ -47,8 +47,10 @@
 /* Stuff specific to the 8-bit symbol version of the general purpose RS codecs
  *
  */
-typedef unsigned char data_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Reed-Solomon codec control block
@@ -306,7 +308,6 @@ void free_rs_cache(void)
 
 #undef A0
 #define A0 (NN) /* Special reserved value encoding zero in index form */
-
 void encode_rs_char(RS *rs, const data_t *data, data_t *parity)
 {
   int i, j;
@@ -335,7 +336,7 @@ void encode_rs_char(RS *rs, const data_t *data, data_t *parity)
   }
 }
 
-#include <memory>
+
 
 int decode_rs_char(RS *rs, unsigned char *data, int *eras_pos, int no_eras) {
     
@@ -588,3 +589,7 @@ int decode_rs_char(RS *rs, unsigned char *data, int *eras_pos, int no_eras) {
     
     return retval;
 }
+
+#ifdef __cplusplus
+}
+#endif
