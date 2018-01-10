@@ -367,7 +367,7 @@ int WTPhysicalFreqMarkToPcm(WTPhyFreqMarkType freq_mark, void  *pcm_buf, int pcm
 
 int WTPhysicalPcmToFreqMarks(const RecvAudioType * pcm_buf, int pcm_len, WaveTransMixMarksType * freq_marks)
 {
-  int threshold = 550;
+  int threshold = 50;
   MixingFreqsInfo freq_info;
   if (GetPcmFreqs(pcm_buf, pcm_len, threshold, &freq_info) != 0) {
     return -1;
