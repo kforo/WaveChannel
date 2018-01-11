@@ -372,6 +372,9 @@ int WTPhysicalPcmToFreqMarks(const RecvAudioType * pcm_buf, int pcm_len, WaveTra
   if (GetPcmFreqs(pcm_buf, pcm_len, threshold, &freq_info) != 0) {
     return -1;
   }
+  if (freq_info.freq_num_ != MIXING_FREQ_NUM) {
+    return -1;
+  }
   int i;
   freq_marks->freq_mark_num_ = 0;
   for (i = 0; i < freq_info.freq_num_; i++) {
