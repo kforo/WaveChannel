@@ -377,7 +377,7 @@ int WTPhysicalPcmToFreqMarks(const RecvAudioType * pcm_buf, int pcm_len, WaveTra
   for (i = 0; i < freq_info.freq_num_; i++) {
     WTPhyFreqMarkType temp;
     if (FreqToFreqMark(freq_info.freqs_[i], &temp) != 0) {
-      continue;
+      return -1;
     }
     freq_marks->marks_[freq_marks->freq_mark_num_] = temp;
     freq_marks->freq_mark_num_++;
