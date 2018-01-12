@@ -107,7 +107,7 @@ int RingBuffReadData(RingBuffFd *fd, void *data, int len)
       }
       else {
         memcpy(((unsigned char *)data + right_len), &fd_data->buff_[fd_data->read_addr_], len - right_len);
-        fd_data->read_addr_ = right_len - len;
+        fd_data->read_addr_ = len - right_len;
         return len;
       }
     }
