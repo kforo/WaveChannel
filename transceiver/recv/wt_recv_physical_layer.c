@@ -39,6 +39,7 @@ typedef struct {
 
 static RingBuffFd       *ring_buff_fd_ = NULL;
 static OldPhyMarkRef    old_mark_ref_;
+static WTPhyFreqMarkType ref_temp_;
 static RecvAudioType pcm_buf_[FREQ_ANA_BUF_SIZE];
 static int pcm_buf_w_addr_ = 0;
 
@@ -52,12 +53,15 @@ static int GetNextData(WTPhyFreqMarkType *data)
 {
   WTPhyFreqMarkType temp;
   int ret;
+  OldPhyMarkRef *ref_mark = &old_mark_ref_;
   BUF_LOCK();
   while ((ret = RingBuffReadData(ring_buff_fd_, &temp, sizeof(WTPhyFreqMarkType))) != 0) {
     if (temp == old_mark_ref_.phy_mark_) {
       old_mark_ref_.mark_num_++;
+      ref_temp_ = REF_MARK_INIT_DATA;
       int old_num = WTPhyAnalysisNumToRealNum(old_mark_ref_.mark_num_);
       if (old_num > old_mark_ref_.already_num_) {
+        //printf(" #%d ", old_mark_ref_.phy_mark_);
         *data = temp;
         old_mark_ref_.already_num_++;
         BUF_UNLOCK();
@@ -65,9 +69,23 @@ static int GetNextData(WTPhyFreqMarkType *data)
       }
     }
     else {
-      old_mark_ref_.phy_mark_ = temp;
-      old_mark_ref_.already_num_ = 0;
-      old_mark_ref_.mark_num_ = 1;
+      if (temp == ref_temp_) {
+        old_mark_ref_.phy_mark_ = temp;
+        old_mark_ref_.mark_num_ = 2;
+        old_mark_ref_.already_num_ = 0;
+        ref_temp_ = REF_MARK_INIT_DATA;
+        int old_num = WTPhyAnalysisNumToRealNum(old_mark_ref_.mark_num_);
+        if (old_num > old_mark_ref_.already_num_) {
+          //printf(" #%d ", old_mark_ref_.phy_mark_);
+          *data = temp;
+          old_mark_ref_.already_num_++;
+          BUF_UNLOCK();
+          return 0;
+        }
+      }
+      else {
+        ref_temp_ = temp;
+      }
     }
   }
   BUF_UNLOCK();
@@ -148,6 +166,7 @@ int WTRecvPhyLayerInit(void)
   old_mark_ref_.phy_mark_ = REF_MARK_INIT_DATA;
   old_mark_ref_.already_num_ = 0;
   old_mark_ref_.mark_num_ = 0;
+  ref_temp_ = REF_MARK_INIT_DATA;
   return 0;
 }
 
@@ -161,6 +180,7 @@ void WTRecvPhyLayerExit(void)
   old_mark_ref_.phy_mark_ = REF_MARK_INIT_DATA;
   old_mark_ref_.already_num_ = 0;
   old_mark_ref_.mark_num_ = 0;
+  ref_temp_ = REF_MARK_INIT_DATA;
   pcm_buf_w_addr_ = 0;
 }
 
