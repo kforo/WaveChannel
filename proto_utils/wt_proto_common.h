@@ -40,7 +40,7 @@ static const FreqAsMark freq_to_mark_list_[] = {
 #define HBYTE_CHECKSUM_NUM              (4)
 #define START_FREQ_MARK                  {16,17}
 #define NONE_MAEK                        (17)
-#define ONE_FREQ_TIME_MS                 (24)
+#define ONE_FREQ_TIME_MS                 (32)
 #define time_ms_to_length(time_ms,sample_rate)          (((time_ms)*(sample_rate))/1000)
 
 #define MIXING_FREQ_NUM                   (4)
