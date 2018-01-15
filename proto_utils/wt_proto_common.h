@@ -2,7 +2,7 @@
 #define __WT_PROTO_COMMON_H__
 
 /*global config*/
-#define FREQ_MODE_MUX
+//#define FREQ_MODE_MUX
 typedef unsigned char WTPhyFreqMarkType;
 typedef struct {
   int                   freq_;
@@ -10,37 +10,36 @@ typedef struct {
 }FreqAsMark;
 
 static const FreqAsMark freq_to_mark_list_[] = {
-  { 1765,0 },
-  { 1986,1 },
-  { 2211,2 },
-  { 2492,3 },
-  { 2799,4 },
-  { 3243,5 },
-  { 3482,6 },
-  { 3751,7 },
-  { 3987,8 },
-  { 4192,9 },
-  { 4430,10 },
-  { 4794,11 },
-  { 5000,12 },
-  { 5449,13 },
-  { 5900,14 },
-  { 6262,15 },
-  { 6627,16 },
-  { 7004,17 },
+  { 740,0 },
+  { 988,1 },
+  { 1480,2 },
+  { 1760,3 },
+  { 1976,4 },
+  { 2217,5 },
+  { 2489,6 },
+  { 2794,7 },
+  { 2960,8 },
+  { 3520,9 },
+  { 3729,10 },
+  { 3951,11 },
+  { 4186,12 },
+  { 4435,13 },
+  { 4699,14 },
+  { 4978,15 },
+  { 5274,16 },
+  { 5588,17 },
   { -1,-1 },  //list end
 };
-
-#define FREQ_LIST               {1765,1986,2211,2492,2799,3243,3482,3751,3987,4192,4430,4794,5000,5449,5900,6262,6627,7004}
+#define MAX_FREQ                (5588)
+#define MIN_FREQ                (740)
+//#define FREQ_LIST               {1765,1986,2211,2492,2799,3243,3482,3751,3987,4192,4430,4794,5000,5449,5900,6262,6627,7004}
 #define FREQ_LIST_LEN           (18)
-#define MAX_FREQ                (7004)
-#define MIN_FREQ                (1765)
 #define START_FREQ_NUM                  (2)
 #define HBYTE_DATA_NUM                  (8)
 #define HBYTE_CHECKSUM_NUM              (4)
 #define START_FREQ_MARK                  {16,17}
 #define NONE_MAEK                        (17)
-#define ONE_FREQ_TIME_MS                 (24)
+#define ONE_FREQ_TIME_MS                 (12)
 #define time_ms_to_length(time_ms,sample_rate)          (((time_ms)*(sample_rate))/1000)
 
 #define MIXING_FREQ_NUM                   (4)
@@ -52,7 +51,7 @@ static const FreqAsMark freq_to_mark_list_[] = {
 /*recv side config*/
 #define RECV_SAMPLE_BIT                         (16)
 #define RECV_SAMPLE_RATE                        (16000)
-#define FREQ_ANALYZE_SAMPLE_TIME_MS             (8)
+#define FREQ_ANALYZE_SAMPLE_TIME_MS             (4)
 #if (RECV_SAMPLE_BIT==8)
 typedef char    RecvAudioType;
 #endif

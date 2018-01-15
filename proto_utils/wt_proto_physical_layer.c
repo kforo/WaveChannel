@@ -17,7 +17,7 @@ typedef struct {
   long        diff_;
 }FFTAnalysisSt;
 
-static int format_freq_list_[FREQ_LIST_LEN] = FREQ_LIST;
+
 static double theta = 0;
 
 static int GetPcmMaxAmplitudeFreq(const RecvAudioType *pcm_buf, int len, int threshold)
@@ -48,8 +48,11 @@ static int GetPcmMaxAmplitudeFreq(const RecvAudioType *pcm_buf, int len, int thr
   int size = len / 2;
   double max_item = 0;
   int max_item_mark = 0;
-  int find_left = ((MIN_FREQ - (2 * MAX_FREQ_MISTAKE))*len) / RECV_SAMPLE_RATE;
-  int find_right = ((MAX_FREQ + (2 * MAX_FREQ_MISTAKE))*len) / RECV_SAMPLE_RATE;
+  int find_left = ((MIN_FREQ - MAX_FREQ_MISTAKE)*len) / RECV_SAMPLE_RATE;
+  if (find_left <= 0) {
+    find_left = 1;
+  }
+  int find_right = ((MAX_FREQ + MAX_FREQ_MISTAKE)*len) / RECV_SAMPLE_RATE;
   for (i=find_left; i < find_right; i++) {
     double out_data_item = sqrt(pow(out_data[i].r, 2) + pow(out_data[i].i, 2));
     if (out_data_item > max_item) {
@@ -190,14 +193,14 @@ error_exit:
 static int FreqToFreqMark(int fft_freq, WTPhyFreqMarkType *mark)
 {
   int max_freq_mistake = MAX_FREQ_MISTAKE;
-  if (fft_freq<format_freq_list_[0] - max_freq_mistake || fft_freq > format_freq_list_[FREQ_LIST_LEN - 1] + max_freq_mistake) {
+  if (fft_freq<freq_to_mark_list_[0].freq_ - max_freq_mistake || fft_freq > freq_to_mark_list_[FREQ_LIST_LEN - 1].freq_ + max_freq_mistake) {
     return -1;
   }
-  if (fft_freq < format_freq_list_[0]) {
+  if (fft_freq < freq_to_mark_list_[0].freq_) {
     *mark = 0;
     return 0;
   }
-  if (fft_freq > format_freq_list_[FREQ_LIST_LEN - 1]) {
+  if (fft_freq > freq_to_mark_list_[FREQ_LIST_LEN - 1].freq_) {
     *mark = FREQ_LIST_LEN - 1;
     return 0;
   }
@@ -205,32 +208,35 @@ static int FreqToFreqMark(int fft_freq, WTPhyFreqMarkType *mark)
   int right = FREQ_LIST_LEN - 1;
   while (right - left > 1) {
     int mid = (left + right) / 2;
-    if (fft_freq < format_freq_list_[mid]) {
+    if (fft_freq < freq_to_mark_list_[mid].freq_) {
       right = mid;
     }
     else {
       left = mid;
     }
   }
-  int left_inval = fft_freq - format_freq_list_[left];
-  int right_inval = format_freq_list_[right] - fft_freq;
+  int left_inval = fft_freq - freq_to_mark_list_[left].freq_;
+  int right_inval = freq_to_mark_list_[right].freq_ - fft_freq;
   if (left_inval > max_freq_mistake&&right_inval > max_freq_mistake) {
     return -1;
   }
   if (left_inval < right_inval) {
-    *mark = (WTPhyFreqMarkType)left;
+    *mark = freq_to_mark_list_[left].mark_;
   }
   else {
-    *mark = (WTPhyFreqMarkType)right;
+    *mark = freq_to_mark_list_[right].mark_;
   }
   return 0;
 }
 
 static int FreqMarkToFreq(WTPhyFreqMarkType freq_mark, int *freq)
 {
-  if (freq_mark >= 0 && freq_mark < FREQ_LIST_LEN) {
-    *freq = format_freq_list_[freq_mark];
-    return 0;
+  int i;
+  for (i = 0; freq_to_mark_list_[i].freq_ != -1; i++) {
+    if (freq_mark == freq_to_mark_list_[i].mark_) {
+      *freq = freq_to_mark_list_[i].freq_;
+      return 0;
+    }
   }
   return -1;
 }
