@@ -15,7 +15,7 @@ typedef struct {
 static int CheckIsWriteCover(RingBuffData *fd_data, int write_len)
 {
   if (fd_data->write_addr_ >= fd_data->read_addr_) {
-    if (fd_data->buff_len_ - (fd_data->write_addr_ - fd_data->read_addr_) < write_len) {
+    if (fd_data->buff_len_ - (fd_data->write_addr_ - fd_data->read_addr_) - 1 < write_len) {
       return 1;
     }
     else {
@@ -23,7 +23,7 @@ static int CheckIsWriteCover(RingBuffData *fd_data, int write_len)
     }
   }
   else {
-    if (fd_data->read_addr_ - fd_data->write_addr_ < write_len) {
+    if (fd_data->read_addr_ - fd_data->write_addr_ - 1 < write_len) {
       return 1;
     }
     else {
@@ -74,7 +74,7 @@ int RingBuffWriteData(RingBuffFd *fd, const void *data, int len)
   }
   if (cover_flag == 1) {
     if (fd_data->write_addr_ == fd_data->buff_len_ - 1) {
-      fd_data->read_addr_ = 0;
+      fd_data->read_addr_ = 1;
     }
     else {
       fd_data->read_addr_ = fd_data->write_addr_ + 1;
