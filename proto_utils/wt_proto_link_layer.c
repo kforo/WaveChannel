@@ -82,7 +82,13 @@ static void SetMixDataForPackage(unsigned char in_data, WaveTransMixMarksType *o
 
 void WTLinkGetDataChecksum(WaveTransLinkPackage *package)
 {
-  package->check_sum_ = crc_16(package->byte_data_, package->real_data_num_);
+  void *rs_hander = NULL;
+  rs_hander = init_rs(RS_SYMSIZE, RS_GFPOLY, RS_FCR, RS_PRIM, HBYTE_CHECKSUM_NUM/2, ((1 << RS_SYMSIZE) - 1 - (package->real_data_num_ + HBYTE_CHECKSUM_NUM/2)));
+  if (rs_hander == NULL) {
+    return;
+  }
+  encode_rs_char(rs_hander, (data_t *)package->byte_data_, (data_t *)(&package->check_sum_));
+  free_rs_cache();
 }
 
 void WTLinkGetDataChecksumMix(WaveTransMixLinkPackage * package)
@@ -203,10 +209,19 @@ int WTLinkCheckStMarkMux(WaveTransMixMarksType * marks, int mark_num)
 
 int WTLinkChecksumOk(WaveTransLinkPackage * package)
 {
-  unsigned short package_checksum = crc_16(package->byte_data_, package->real_data_num_);
-  if (package_checksum != package->check_sum_) {
-    return 0;
+  void *rs_hander = NULL;
+  int eras_pos[HBYTE_DATA_NUM / 2 + HBYTE_CHECKSUM_NUM / 2];
+  unsigned char buff[HBYTE_DATA_NUM / 2 + HBYTE_CHECKSUM_NUM / 2] = { 0 };
+  memset(eras_pos, 0, sizeof(int)*(HBYTE_DATA_NUM / 2) + HBYTE_CHECKSUM_NUM/2);
+  rs_hander = init_rs(RS_SYMSIZE, RS_GFPOLY, RS_FCR, RS_PRIM, HBYTE_CHECKSUM_NUM / 2, ((1 << RS_SYMSIZE) - 1 - (package->real_data_num_ + HBYTE_CHECKSUM_NUM / 2)));
+  if (rs_hander == NULL) {
+    return 1;
   }
+  memcpy(buff, package->byte_data_, package->real_data_num_);
+  memcpy(buff + package->real_data_num_, &package->check_sum_, HBYTE_CHECKSUM_NUM / 2);
+  decode_rs_char(rs_hander, buff, eras_pos, 0);
+  memcpy(package->byte_data_, buff, package->real_data_num_);
+  free_rs_cache();
   return 1;
 }
 
