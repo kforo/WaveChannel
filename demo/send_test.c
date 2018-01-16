@@ -9,7 +9,7 @@ int main(void)
 {
   int ret;
   FILE *fp = NULL;
-  char test_context[] = "1234567890abcdefghijklmnopqrstuvwxyz";
+  char test_context[] = "1234567890abcdefghijklmnopqrstuvwxyz\n";
   WaveTransSendHander *wt_send_hander = NULL;
   WaveTransSendAttr attr;
   attr.sample_bit_ = 16;
