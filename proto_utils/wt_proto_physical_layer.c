@@ -310,7 +310,7 @@ static int EncodeSoundMixing(const MixingFreqsInfo *freqs_info, void *buffer, in
   return 0;
 }
 
-static int EncodeSound(int freq, void *buffer, int buffer_length,int sample_bit,int sample_rate)
+static int WTPhyEncodeSound(int freq, void *buffer, int buffer_length,int sample_bit,int sample_rate)
 {
 
 
@@ -365,7 +365,7 @@ int WTPhysicalFreqMarkToPcm(WTPhyFreqMarkType freq_mark, void  *pcm_buf, int pcm
   if (FreqMarkToFreq(freq_mark, &freq) != 0) {
     return -1;
   }
-  if (EncodeSound(freq, pcm_buf, pcm_len,sample_bit, sample_rate) != 0) {
+  if (WTPhyEncodeSound(freq, pcm_buf, pcm_len,sample_bit, sample_rate) != 0) {
     return -1;
   }
   return 0;

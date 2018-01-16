@@ -64,7 +64,7 @@ typedef short   RecvAudioType;
 /*send side config*/
 #define  AUDIO_AMPLITUDE_SCALE            (85)  //AUDIO_AMPLITUDE_SCALE/100 * max value
 #define  AUDIO_NONE_TIME_MS               (200)
-#define  AUDIO_NONE_LEN(sample_rate)      ((AUDIO_NONE_TIME_MS*sample_rate)/1000)
+#define  AUDIO_NONE_LEN(sample_rate)      ((AUDIO_NONE_TIME_MS*(sample_rate))/1000)
 
 
 
