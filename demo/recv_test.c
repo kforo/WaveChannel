@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef WIN32
+#include <crtdbg.h>
+#endif
 
 #include "proto_utils/wt_proto_common.h"
 #include "interface/wave_trans_recv.h"
@@ -27,6 +30,9 @@ int main()
   }
   while (1) {
     ret = (int)fread(pcm_buf, (size_t)1, (size_t)(sizeof(RecvAudioType) * 320), fp);
+    if (ret <= 0) {
+      break;
+    }
     WaveTransRecvSetPcm(pcm_buf, ret / sizeof(RecvAudioType));
     ret = WaveTransRecvGetContext(data_temp, sizeof(char) * 10);
     if (ret != 0) {
@@ -34,6 +40,10 @@ int main()
       printf("%s", data_temp);
     }
   }
+  fclose(fp);
   WaveTransRecvExit();
+#ifdef WIN32
+  _CrtDumpMemoryLeaks();
+#endif
   return 0;
 }
