@@ -155,11 +155,31 @@ int WTLinkCheckStCode(WTFreqCodeType code, int addr)
 
 int WTLinkChecksumDecode(WaveTransCompareLinkPackage * package)
 {
+  void *rs_hander = NULL;
+  int eras_pos[COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM];
+  unsigned char buff[COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM] = { 0 };
+  memset(eras_pos, 0, sizeof(int)*(COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM));
+  rs_hander = init_rs(RS_SYMSIZE, RS_GFPOLY, RS_FCR, RS_PRIM, COMPARE_FREQ_CHECKSUM_NUM, ((1 << RS_SYMSIZE) - 1 - (package->real_data_num_ + COMPARE_FREQ_CHECKSUM_NUM)));
+  if (rs_hander == NULL) {
+    return 1;
+  }
+  memcpy(buff, package->byte_data_, package->real_data_num_);
+  memcpy(buff + package->real_data_num_, &package->check_sum_, COMPARE_FREQ_CHECKSUM_NUM);
+  decode_rs_char(rs_hander, buff, eras_pos, 0);
+  memcpy(package->byte_data_, buff, package->real_data_num_);
+  free_rs_cache();
   return 1;
 }
 
 void WTLinkChecksumEncode(WaveTransCompareLinkPackage * package)
 {
+  void *rs_hander = NULL;
+  rs_hander = init_rs(RS_SYMSIZE, RS_GFPOLY, RS_FCR, RS_PRIM, COMPARE_FREQ_CHECKSUM_NUM / 2, ((1 << RS_SYMSIZE) - 1 - (package->real_data_num_ + COMPARE_FREQ_CHECKSUM_NUM / 2)));
+  if (rs_hander == NULL) {
+    return;
+  }
+  encode_rs_char(rs_hander, (data_t *)package->byte_data_, (data_t *)(&package->check_sum_));
+  free_rs_cache();
 }
 
 void WTLinkPcakgeToPhyPack(const WaveTransCompareLinkPackage * package, WaveTransComparePhyPackage * phy_pack)
