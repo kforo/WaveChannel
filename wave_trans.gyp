@@ -143,5 +143,19 @@
           'libwavetrans',
         ],
       }, #target phy_test
+      {
+        'target_name': 'test_tools',
+        'type': 'executable',
+        'include_dirs': [
+          './demo',
+          '.',
+        ],
+        'sources': [
+          'demo/test_tools.c',
+        ],
+        'dependencies': [
+          'libwavetrans',
+        ],
+      }, #target test_tools
     ],
 }

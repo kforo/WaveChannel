@@ -174,8 +174,12 @@ WTSendLinkForCompareHander * WTSendLinkLayerCreateHanderForCompare(void)
 void WTSendLinkLayerDestroyHanderForCompare(WTSendLinkForCompareHander * hander)
 {
   WTLinkSendHanderDataCompare *hander_data = (WTLinkSendHanderDataCompare *)hander->data_;
-  free(hander_data->packages_.package_);
-  hander_data->packages_.package_ = NULL;
+  if (hander_data->packages_.package_ != NULL) {
+    free(hander_data->packages_.package_);
+    hander_data->packages_.package_ = NULL;
+  }
+  free(hander_data);
+  free(hander);
 }
 
 WTSendLinkComparePackageS * WTSendLinkLayerGetPackageForCompare(WTSendLinkForCompareHander * hander, const void * context, int context_len)
