@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 
-#define WT_LOG_ON
+//#define WT_LOG_ON
 //#define WT_LOG_TO_FILE
 #define LOG_FILE_PATH                   "wt.log"
 extern FILE *log_fp_;

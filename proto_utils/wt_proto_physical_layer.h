@@ -19,6 +19,13 @@ typedef struct {
   WTPhyFreqMarkType               marks_[MIXING_FREQ_NUM];
 }WaveTransMixMarksType;
 
+typedef struct {
+  int         bit_num_;
+  double      left_phase_[COMPARE_FREQ_BIT];
+  double      right_phase_[COMPARE_FREQ_BIT];
+}RefPhaseInfo;
+
+
 
 
 int WTPhysicalPcmToFreqMark(const RecvAudioType *pcm_buf, int pcm_len, WTPhyFreqMarkType *freq_mark);
@@ -31,7 +38,9 @@ int WTPhysicalFreqMarksToPcm(const WaveTransMixMarksType *freq_marks, void *pcm_
 
 int WTPhyAnalysisNumToRealNum(int ana_num);
 
+int WTPhysicalPcmDecode(const RecvAudioType *pcm_buf, int pcm_len, WTFreqCodeType *code);
 
+int WTPhysicalPcmEncode(WTFreqCodeType code, void *pcm_buf, int pcm_len, RefPhaseInfo *ref_phase, int sample_bit, int sample_rate);
 
 
 

@@ -142,3 +142,71 @@ void WTSendPhyLayerReleasePcmMixing(WTSendPhyForMixHander * hander)
   free(hander_data->pcm_info_.buff_);
   hander_data->pcm_info_.buff_ = NULL;
 }
+
+WTSendPhyForCompareHander * WTSendPhyLayerCreateHanderForCompare(WTSendPhyHanderAttr * attr)
+{
+  WTPhySendHanderData *hander_data = (WTPhySendHanderData *)malloc(sizeof(WTPhySendHanderData));
+  if (hander_data == NULL) {
+    return NULL;
+  }
+  WTSendPhyForCompareHander *hander = (WTSendPhyForCompareHander *)malloc(sizeof(WTSendPhyForCompareHander));
+  if (hander == NULL) {
+    free(hander_data);
+    return NULL;
+  }
+  hander_data->pcm_info_.buff_ = NULL;
+  hander_data->pcm_info_.buff_len_ = 0;
+  hander_data->sample_bit_ = attr->sample_bit_;
+  hander_data->sample_rate_ = attr->sample_rate_;
+  hander->data_ = hander_data;
+  return hander;
+}
+
+void WTSendPhyLayerDestroyHanderForCompare(WTSendPhyForCompareHander * hander)
+{
+  WTPhySendHanderData *hander_data = (WTPhySendHanderData *)hander->data_;
+  if (hander_data->pcm_info_.buff_ != NULL) {
+    free(hander_data->pcm_info_.buff_);
+    hander_data->pcm_info_.buff_ = NULL;
+  }
+  free(hander->data_);
+  free(hander);
+}
+
+WTSendPcmBuffType * WTSendPhyLayerGetPcmCompare(WTSendPhyForCompareHander * hander, WTSendLinkComparePackageS * packages)
+{
+  int one_package_size = COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM;
+  int marks_num = one_package_size * packages->package_num_;
+  WTPhySendHanderData *hander_data = (WTPhySendHanderData *)hander->data_;
+  hander_data->pcm_info_.buff_ = malloc((hander_data->sample_bit_ / 8)*WTGetPcmSize(marks_num, hander_data->sample_rate_));
+  if (hander_data->pcm_info_.buff_ == NULL) {
+    return NULL;
+  }
+  WTFreqCodeType *temp;
+  RefPhaseInfo ref_phase;
+  ref_phase.bit_num_ = COMPARE_FREQ_BIT;
+  memset(&ref_phase.left_phase_, 0, sizeof(double)*COMPARE_FREQ_BIT);
+  memset(&ref_phase.right_phase_, 0, sizeof(double)*COMPARE_FREQ_BIT);
+  int pcm_w_addr = 0;
+  int i, j;
+  int one_freq_pcm_size = WTGetPcmSize(1, hander_data->sample_rate_)*(hander_data->sample_bit_ / 8);
+  for (i = 0; i < packages->package_num_; i++) {
+    temp = (WTFreqCodeType *)(&packages->package_[i]);
+    for (j = 0; j < one_package_size; j++) {
+      WTPhysicalPcmEncode(temp[j], (unsigned char *)hander_data->pcm_info_.buff_ + pcm_w_addr,
+        one_freq_pcm_size, &ref_phase, hander_data->sample_bit_, hander_data->sample_rate_);
+      pcm_w_addr += one_freq_pcm_size;
+    }
+  }
+  hander_data->pcm_info_.buff_len_ = (hander_data->sample_bit_ / 8)*WTGetPcmSize(marks_num, hander_data->sample_rate_);
+  hander_data->pcm_info_.sample_bit_ = hander_data->sample_bit_;
+  hander_data->pcm_info_.sample_rate_ = hander_data->sample_rate_;
+  return &hander_data->pcm_info_;
+}
+
+void WTSendPhyLayerReleasePcmCompare(WTSendPhyForCompareHander * hander)
+{
+  WTPhySendHanderData *hander_data = (WTPhySendHanderData *)hander->data_;
+  free(hander_data->pcm_info_.buff_);
+  hander_data->pcm_info_.buff_ = NULL;
+}

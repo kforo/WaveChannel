@@ -12,6 +12,10 @@ typedef struct {
 }WTSendLinkForMixHander;
 
 typedef struct {
+  void          *data_;
+}WTSendLinkForCompareHander;
+
+typedef struct {
   int                     package_num_;
   WaveTransPhyPackage    *package_;
 }WTSendLinkPackageS;
@@ -21,6 +25,11 @@ typedef struct {
   int                     package_num_;
   WaveTransMixPhyPackage     *package_;
 }WTSendLinkMixPackageS;
+
+typedef struct {
+  int                           package_num_;
+  WaveTransComparePhyPackage    *package_;
+}WTSendLinkComparePackageS;
 
 WTSendLinkHander * WTSendLinkLayerCreateHander(void);
 
@@ -39,5 +48,13 @@ WTSendLinkMixPackageS *WTSendLinkLayerGetPackageForMix(WTSendLinkForMixHander *h
 
 void WTSendLinkLayerReleasePackageForMix(WTSendLinkForMixHander *hander);
 
+
+WTSendLinkForCompareHander * WTSendLinkLayerCreateHanderForCompare(void);
+
+void WTSendLinkLayerDestroyHanderForCompare(WTSendLinkForCompareHander *hander);
+
+WTSendLinkComparePackageS *WTSendLinkLayerGetPackageForCompare(WTSendLinkForCompareHander *hander, const void *context, int context_len);
+
+void WTSendLinkLayerReleasePackageForCompare(WTSendLinkForCompareHander *hander);
 
 #endif

@@ -80,6 +80,7 @@
           'log_utils/wt_log.h',
           'log_utils/wt_log.c',
           'proto_utils/wt_proto_common.h',
+          'proto_utils/wt_proto_common.c',
           'proto_utils/wt_proto_link_layer.c',
           'proto_utils/wt_proto_link_layer.h',
           'proto_utils/wt_proto_physical_layer.c',

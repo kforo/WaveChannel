@@ -11,6 +11,8 @@
 
 static WTPhyFreqMarkType proto_st_mark_[START_FREQ_NUM] = START_FREQ_MARK;
 
+static WTFreqCodeType freq_code_st_mark_[COMPARE_FREQ_ST_NUM] = COMPARE_ST_CODE;
+
 static WaveTransMixMarksType proto_st_mark_mux_ = {
   4,
   {0,3,16,17},
@@ -140,6 +142,56 @@ void WTLinkPackageToMixPackage(const WaveTransMixLinkPackage * package, WaveTran
   unsigned char *temp = (unsigned char *)(&package->check_sum_);
   for (i = 0; i < MIXING_CHECKSUM_NUM; i++) {
     SetMixDataForPackage(temp[i], &mix_package->check_byte_data_[i]);
+  }
+}
+
+int WTLinkCheckStCode(WTFreqCodeType code, int addr)
+{
+  if (code != freq_code_st_mark_[addr]) {
+    return 0;
+  }
+  return 1;
+}
+
+int WTLinkChecksumDecode(WaveTransCompareLinkPackage * package)
+{
+  return 1;
+}
+
+void WTLinkChecksumEncode(WaveTransCompareLinkPackage * package)
+{
+}
+
+void WTLinkPcakgeToPhyPack(const WaveTransCompareLinkPackage * package, WaveTransComparePhyPackage * phy_pack)
+{
+  int i;
+  for (i = 0; i < COMPARE_FREQ_ST_NUM; i++) {
+    phy_pack->st_mark_[i] = freq_code_st_mark_[i];
+  }
+  for (i = 0; i < package->real_data_num_; i++) {
+    phy_pack->byte_data_[i] = package->byte_data_[i];
+  }
+  for (; i < COMPARE_FREQ_DATA_NUM; i++) {
+    phy_pack->byte_data_[i] = COMPARE_FREQ_NONE;
+  }
+  for (i = 0; i < COMPARE_FREQ_CHECKSUM_NUM; i++) {
+    phy_pack->check_byte_data_[i] = package->check_sum_[i];
+  }
+}
+
+void WTLinkPhyPcakgeToLinkPack(const WaveTransComparePhyPackage * package, WaveTransCompareLinkPackage * link_pack)
+{
+  int i;
+  link_pack->real_data_num_ = 0;
+  for (i = 0; i < COMPARE_FREQ_DATA_NUM; i++) {
+    if (package->byte_data_[i] == COMPARE_FREQ_NONE) {
+      break;
+    }
+    link_pack->byte_data_[link_pack->real_data_num_] = (unsigned char)package->byte_data_[i];
+    link_pack->real_data_num_++;
+  }
+  for (i = 0; i < COMPARE_FREQ_CHECKSUM_NUM; i++) {
+    link_pack->check_sum_[i] = (unsigned char)package->check_byte_data_[i];
   }
 }
 

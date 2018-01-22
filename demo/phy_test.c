@@ -36,6 +36,33 @@
 //  return 0;
 //}
 
+#if 1
+int main()
+{
+  short pcm_buf[128];
+  memset(pcm_buf, 0, sizeof(short) * 128);
+  int buf_len = 128;
+  FILE *fp = NULL;
+  fp = fopen("test.pcm", "rb");
+  if (fp == NULL) {
+    printf("open file phy.pcm failed\n");
+    return 1;
+  }
+  WTFreqCodeType mark;
+  int ret;
+  while ((ret = fread(pcm_buf, 1, sizeof(short)*buf_len, fp)) == buf_len * sizeof(short)) {
+    if (WTPhysicalPcmDecode(pcm_buf, buf_len, &mark) != 0) {
+      continue;
+    }
+    printf(" %d ", mark);
+  }
+  fclose(fp);
+  int i;
+  return 0;
+}
+#endif
+
+#if 0
 int main()
 {
   short pcm_buf[384];
@@ -47,12 +74,14 @@ int main()
     printf("open file phy.pcm failed\n");
     return 1;
   }
-  WTPhyFreqMarkType mark;
+  WTFreqCodeType mark;
+  RefPhaseInfo ref_phase;
+  memset(&ref_phase, 0, sizeof(RefPhaseInfo));
   int i;
-  for (i = 0; i < 18; i++) {
+  for (i = 0; i < 512; i++) {
     mark = i;
    // mark = 2;
-    if (WTPhysicalFreqMarkToPcm(mark, pcm_buf, sizeof(short)*buf_len, 16, 16000) != 0) {
+    if (WTPhysicalPcmEncode(mark, pcm_buf, sizeof(short)*buf_len, &ref_phase, 16, 16000) != 0) {
       fclose(fp);
       return 1;
     }
@@ -66,3 +95,4 @@ int main()
   fclose(fp);
   return 0;
 }
+#endif

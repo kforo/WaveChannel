@@ -16,4 +16,10 @@ void WTRecvLinkLayerExitForMix(void);
 int WTRecvLinkLayerGetDataForMix(void *buf, int buf_len);
 
 
+int WTRecvLinkLayerInitForCompare();
+
+void WTRecvLinkLayerExitForCompare();
+
+int WTRecvLinkLayerGetDataForCompare(void *buf, int buf_len);
+
 #endif

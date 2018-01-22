@@ -17,6 +17,12 @@ typedef struct {
 }WaveTransMixPhyPackage;
 
 typedef struct {
+  WTFreqCodeType              st_mark_[COMPARE_FREQ_ST_NUM];
+  WTFreqCodeType              byte_data_[COMPARE_FREQ_DATA_NUM];
+  WTFreqCodeType              check_byte_data_[COMPARE_FREQ_CHECKSUM_NUM];
+}WaveTransComparePhyPackage;;
+
+typedef struct {
   int                 real_data_num_;
   unsigned short      check_sum_;
   unsigned char       byte_data_[HBYTE_DATA_NUM / 2];
@@ -28,7 +34,11 @@ typedef struct {
   unsigned char     byte_data_[MIXING_BYTE_DATA_NUM];
 }WaveTransMixLinkPackage;
 
-
+typedef struct {
+  int               real_data_num_;
+  unsigned char    check_sum_[COMPARE_FREQ_CHECKSUM_NUM];
+  unsigned char     byte_data_[COMPARE_FREQ_DATA_NUM];
+}WaveTransCompareLinkPackage;
 
 void WTLinkHalfPackageToByte(WaveTransPhyPackage * half_package, WaveTransLinkPackage * package);
 
@@ -49,6 +59,16 @@ void WTLinkGetDataChecksumMix(WaveTransMixLinkPackage *package);
 void WTLinkPackageToHalf(const WaveTransLinkPackage * package, WaveTransPhyPackage * half_package);
 
 void WTLinkPackageToMixPackage(const WaveTransMixLinkPackage *package, WaveTransMixPhyPackage *mix_package);
+
+int WTLinkCheckStCode(WTFreqCodeType code, int addr);
+
+int WTLinkChecksumDecode(WaveTransCompareLinkPackage *package);
+
+void WTLinkChecksumEncode(WaveTransCompareLinkPackage *package);
+
+void WTLinkPcakgeToPhyPack(const WaveTransCompareLinkPackage *package, WaveTransComparePhyPackage *phy_pack);
+
+void WTLinkPhyPcakgeToLinkPack(const WaveTransComparePhyPackage *package, WaveTransCompareLinkPackage *link_pack);
 
 
 #endif

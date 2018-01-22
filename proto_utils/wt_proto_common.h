@@ -3,11 +3,14 @@
 
 /*global config*/
 //#define FREQ_MODE_MUX
+#define FREQ_MODE_COMPARE
 typedef unsigned char WTPhyFreqMarkType;
 typedef struct {
   int                   freq_;
   WTPhyFreqMarkType     mark_;
 }FreqAsMark;
+
+typedef unsigned short WTFreqCodeType;
 
 static const FreqAsMark freq_to_mark_list_[] = {
   { 740,0 },
@@ -39,7 +42,7 @@ static const FreqAsMark freq_to_mark_list_[] = {
 #define HBYTE_CHECKSUM_NUM              (4)
 #define START_FREQ_MARK                  {16,17}
 #define NONE_MAEK                        (17)
-#define ONE_FREQ_TIME_MS                 (12)
+#define ONE_FREQ_TIME_MS                 (24)
 #define time_ms_to_length(time_ms,sample_rate)          (((time_ms)*(sample_rate))/1000)
 
 #define MIXING_FREQ_NUM                   (4)
@@ -48,10 +51,26 @@ static const FreqAsMark freq_to_mark_list_[] = {
 #define MIXING_BYTE_DATA_NUM              (4)
 #define MIXING_CHECKSUM_NUM               (2)
 
+#define COMPARE_FREQ_ST_NUM                 (2)
+#define COMPARE_FREQ_DATA_NUM               (4)
+#define COMPARE_FREQ_CHECKSUM_NUM           (2)
+#define COMPARE_FREQ_NUM                    (18)
+#define COMPARE_FREQ_BIT                    (9)
+#define COMPARE_FREQ_NONE                    (0x0103)
+#define COMPARE_ST_CODE                     {0x1aa,0x155}
+typedef struct {
+  int left_freq_;
+  int right_freq_;
+  int bool_;
+}CompareFreqNode;
+
+extern CompareFreqNode compare_freq_list_[];
+
+
 /*recv side config*/
 #define RECV_SAMPLE_BIT                         (16)
 #define RECV_SAMPLE_RATE                        (16000)
-#define FREQ_ANALYZE_SAMPLE_TIME_MS             (4)
+#define FREQ_ANALYZE_SAMPLE_TIME_MS             (8)
 #if (RECV_SAMPLE_BIT==8)
 typedef char    RecvAudioType;
 #endif
@@ -62,7 +81,7 @@ typedef short   RecvAudioType;
 
 
 /*send side config*/
-#define  AUDIO_AMPLITUDE_SCALE            (85)  //AUDIO_AMPLITUDE_SCALE/100 * max value
+#define  AUDIO_AMPLITUDE_SCALE            (40)  //AUDIO_AMPLITUDE_SCALE/100 * max value
 #define  AUDIO_NONE_TIME_MS               (200)
 #define  AUDIO_NONE_LEN(sample_rate)      ((AUDIO_NONE_TIME_MS*(sample_rate))/1000)
 

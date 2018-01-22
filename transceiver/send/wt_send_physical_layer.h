@@ -13,6 +13,10 @@ typedef struct {
 }WTSendPhyForMixHander;
 
 typedef struct {
+  void      *data_;
+}WTSendPhyForCompareHander;
+
+typedef struct {
   int           sample_rate_;
   int           sample_bit_;
 }WTSendPhyHanderAttr;
@@ -35,6 +39,15 @@ void WTSendPhyLayerDestroyHanderForMix(WTSendPhyForMixHander * hander);
 WTSendPcmBuffType * WTSendPhyLayerGetPcmMixing(WTSendPhyForMixHander *hander, WTSendLinkMixPackageS *packages);
 
 void WTSendPhyLayerReleasePcmMixing(WTSendPhyForMixHander *hander);
+
+WTSendPhyForCompareHander *WTSendPhyLayerCreateHanderForCompare(WTSendPhyHanderAttr *attr);
+
+void WTSendPhyLayerDestroyHanderForCompare(WTSendPhyForCompareHander * hander);
+
+WTSendPcmBuffType * WTSendPhyLayerGetPcmCompare(WTSendPhyForCompareHander *hander, WTSendLinkComparePackageS *packages);
+
+void WTSendPhyLayerReleasePcmCompare(WTSendPhyForCompareHander *hander);
+
 
 #endif
 

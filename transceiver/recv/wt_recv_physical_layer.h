@@ -21,4 +21,13 @@ void WTRecvPhyLayerSendPcmForMixing(const RecvAudioType *pcm, int pcm_len);
 int WTRecvPhuLayerGetDataForMixing(WaveTransMixMarksType *data_buf, int buf_len);
 
 
+int WTRecvPhyLayerInitForCompare();
+
+void WTRecvPhyLayerExitForCompare();
+
+void WTRecvPhyLayerSendPcmForCompare(const RecvAudioType *pcm, int pcm_len);
+
+int WTRecvPhuLayerGetDataForCompare(WTFreqCodeType *data_buf, int buf_len);
+
+
 #endif
