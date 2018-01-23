@@ -4,6 +4,7 @@
 #include "proto_utils/wt_proto_physical_layer.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
   int         sample_rate_;
