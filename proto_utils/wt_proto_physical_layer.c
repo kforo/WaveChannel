@@ -492,8 +492,8 @@ WTFreqCodeType GetFreqCodeFromFFTData(const kiss_fft_cpx *fft_data, int fft_len,
     left_item = (long)sqrt(pow(fft_data[fft_left].r, 2)+pow(fft_data[fft_left].i, 2));
     right_item = (long)sqrt(pow(fft_data[fft_right].r, 2)+pow(fft_data[fft_right].i, 2));
     if (left_item > right_item) {
-      if (right_item < min_item) {
-        min_item = right_item;
+      if (left_item < min_item) {
+        min_item = left_item;
         min_bit = i;
       }
       if (compare_freq_list_[i].bool_) {
@@ -501,8 +501,8 @@ WTFreqCodeType GetFreqCodeFromFFTData(const kiss_fft_cpx *fft_data, int fft_len,
       }
     }
     else {
-      if (left_item < min_item) {
-        min_item = left_item;
+      if (right_item < min_item) {
+        min_item = right_item;
         min_bit = i;
       }
       if (!compare_freq_list_[i].bool_) {
