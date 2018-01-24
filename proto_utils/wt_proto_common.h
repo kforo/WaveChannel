@@ -56,6 +56,7 @@ static const FreqAsMark freq_to_mark_list_[] = {
 #define COMPARE_FREQ_CHECKSUM_NUM           (2)
 #define COMPARE_FREQ_NUM                    (18)
 #define COMPARE_FREQ_BIT                    (9)
+#define COMPARE_FREQ_PARITY_BIT              (1)
 #define COMPARE_FREQ_NONE                    (0x0103)
 #define COMPARE_ST_CODE                     {0x1aa,0x155}
 typedef struct {

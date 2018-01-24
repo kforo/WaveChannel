@@ -21,8 +21,8 @@ typedef struct {
 
 typedef struct {
   int         bit_num_;
-  double      left_phase_[COMPARE_FREQ_BIT];
-  double      right_phase_[COMPARE_FREQ_BIT];
+  double      left_phase_[COMPARE_FREQ_BIT+COMPARE_FREQ_PARITY_BIT];
+  double      right_phase_[COMPARE_FREQ_BIT+COMPARE_FREQ_PARITY_BIT];
 }RefPhaseInfo;
 
 

@@ -2,6 +2,7 @@
 #include "kiss_fft/kiss_fft.h"
 #include "kiss_fft/kiss_fftr.h"
 #include "log_utils/wt_log.h"
+#include "checksum_utils/parity_codec.h"
 #include <stdio.h>
 #define PI                      3.1415926535897932384626433832795028841971 
 #define MAX_FREQ_MISTAKE                       ((int)(1000.0/FREQ_ANALYZE_SAMPLE_TIME_MS))
@@ -481,6 +482,8 @@ WTFreqCodeType GetFreqCodeFromFFTData(const kiss_fft_cpx *fft_data, int fft_len,
   int step = 1000 / sample_time_ms;
   //FILE *fp = fopen("result.txt", "w");
   WTFreqCodeType temp = 0x0000;
+  long min_item = 999999;
+  int min_bit;
   for (i = 0; compare_freq_list_[i].left_freq_ != -1; i++) {
     int fft_left, fft_right;
     fft_left = compare_freq_list_[i].left_freq_ / step;
@@ -489,16 +492,33 @@ WTFreqCodeType GetFreqCodeFromFFTData(const kiss_fft_cpx *fft_data, int fft_len,
     left_item = (long)sqrt(pow(fft_data[fft_left].r, 2)+pow(fft_data[fft_left].i, 2));
     right_item = (long)sqrt(pow(fft_data[fft_right].r, 2)+pow(fft_data[fft_right].i, 2));
     if (left_item > right_item) {
+      if (right_item < min_item) {
+        min_item = right_item;
+        min_bit = i;
+      }
       if (compare_freq_list_[i].bool_) {
         temp |= (0x0001) << i;
       }
     }
     else {
+      if (left_item < min_item) {
+        min_item = left_item;
+        min_bit = i;
+      }
       if (!compare_freq_list_[i].bool_) {
         temp |= (0x0001) << i;
       }
     }
   }
+  if (ParityDecode(temp, COMPARE_FREQ_BIT, ((temp&(0x0001 << 9))>>9)) != 1) {
+    if (temp&(0x0001 << min_bit)) {
+      temp &= ~(0x0001 << min_bit);
+    }
+    else {
+      temp |= 0x0001 << min_bit;
+    }
+  }
+  temp &= ~(0x0001 << 9);
   WtLog(" %d ", temp);
   //fclose(fp);
   //printf("temp:%d\n", temp);
@@ -614,9 +634,17 @@ int WTPhysicalPcmEncode(WTFreqCodeType code, void * pcm_buf, int pcm_len, RefPha
 {
   FreqEncodeInfo freq_code_info;
   freq_code_info.freq_num_ = 0;
+  unsigned short temp_data = code;
+  unsigned char parity = ParityEncode(temp_data, COMPARE_FREQ_BIT);
+  if (parity) {
+    temp_data |= (0x0001) << 9;
+  }
+  else {
+    temp_data &= ~((0x0001) << 9);
+  }
   int i;
-  for (i = 0; i < COMPARE_FREQ_BIT; i++) {
-    if ((0x0001 << i)&code) {
+  for (i = 0; i < COMPARE_FREQ_BIT+COMPARE_FREQ_PARITY_BIT; i++) {
+    if ((0x0001 << i)&temp_data) {
       if (compare_freq_list_[i].bool_) {
         freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_ = compare_freq_list_[i].left_freq_;
         freq_code_info.freq_and_phase_[freq_code_info.freq_num_].phase_ = ref_phase->left_phase_[i];
