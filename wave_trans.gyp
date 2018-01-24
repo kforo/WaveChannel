@@ -70,6 +70,8 @@
           'checksum_utils/crc_codec.h',
           'checksum_utils/rs_code.cc',
           'checksum_utils/rs_code.h',
+          'checksum_utils/parity_codec.c',
+          'checksum_utils/parity_codec.h',
           'kiss_fft/_kiss_fft_guts.h',
           'kiss_fft/kiss_fastfir.c',
           'kiss_fft/kiss_fastfir.h',
