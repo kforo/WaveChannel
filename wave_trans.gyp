@@ -157,5 +157,19 @@
           'libwavetrans',
         ],
       }, #target test_tools
+      {
+        'target_name': 'rs_test',
+        'type': 'executable',
+        'include_dirs': [
+          './demo',
+          '.',
+        ],
+        'sources': [
+          'demo/rs_test.c',
+        ],
+        'dependencies': [
+          'libwavetrans',
+        ],
+      }, #target rs_test
     ],
 }
