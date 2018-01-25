@@ -5,18 +5,18 @@
 #include <stdlib.h>
 
 typedef struct {
-  WTSendLinkComparePackageS      packages_;
-}WTLinkSendHanderDataCompare;
+  WTSendLinkPackageS      packages_;
+}WTLinkSendHanderData;
 
-WTSendLinkForCompareHander * WTSendLinkLayerCreateHanderForCompare(void)
+WTSendLinkHander * WTSendLinkLayerCreateHander(void)
 {
-  WTLinkSendHanderDataCompare *hander_data = (WTLinkSendHanderDataCompare *)malloc(sizeof(WTLinkSendHanderDataCompare));
+  WTLinkSendHanderData *hander_data = (WTLinkSendHanderData *)malloc(sizeof(WTLinkSendHanderData));
   if (hander_data == NULL) {
     return NULL;
   }
   hander_data->packages_.package_num_ = 0;
   hander_data->packages_.package_ = NULL;
-  WTSendLinkForCompareHander *hander = (WTSendLinkForCompareHander *)malloc(sizeof(WTSendLinkForCompareHander));
+  WTSendLinkHander *hander = (WTSendLinkHander *)malloc(sizeof(WTSendLinkHander));
   if (hander == NULL) {
     free(hander_data);
     return NULL;
@@ -25,9 +25,9 @@ WTSendLinkForCompareHander * WTSendLinkLayerCreateHanderForCompare(void)
   return hander;
 }
 
-void WTSendLinkLayerDestroyHanderForCompare(WTSendLinkForCompareHander * hander)
+void WTSendLinkLayerDestroyHander(WTSendLinkHander * hander)
 {
-  WTLinkSendHanderDataCompare *hander_data = (WTLinkSendHanderDataCompare *)hander->data_;
+  WTLinkSendHanderData *hander_data = (WTLinkSendHanderData *)hander->data_;
   if (hander_data->packages_.package_ != NULL) {
     free(hander_data->packages_.package_);
     hander_data->packages_.package_ = NULL;
@@ -36,11 +36,11 @@ void WTSendLinkLayerDestroyHanderForCompare(WTSendLinkForCompareHander * hander)
   free(hander);
 }
 
-WTSendLinkComparePackageS * WTSendLinkLayerGetPackageForCompare(WTSendLinkForCompareHander * hander, const void * context, int context_len)
+WTSendLinkPackageS * WTSendLinkLayerGetPackage(WTSendLinkHander * hander, const void * context, int context_len)
 {
   int package_num;
   int data_r_addr = 0;
-  WaveTransCompareLinkPackage one_package;
+  WaveTransLinkPackage one_package;
   int i;
   if (context_len % COMPARE_FREQ_DATA_NUM != 0) {
     package_num = context_len / COMPARE_FREQ_DATA_NUM + 1;
@@ -48,8 +48,8 @@ WTSendLinkComparePackageS * WTSendLinkLayerGetPackageForCompare(WTSendLinkForCom
   else {
     package_num = context_len / COMPARE_FREQ_DATA_NUM;
   }
-  WTLinkSendHanderDataCompare *hander_data = (WTLinkSendHanderDataCompare *)hander->data_;
-  hander_data->packages_.package_ = (WaveTransComparePhyPackage *)malloc(sizeof(WaveTransComparePhyPackage)*package_num);
+  WTLinkSendHanderData *hander_data = (WTLinkSendHanderData *)hander->data_;
+  hander_data->packages_.package_ = (WaveTransPhyPackage *)malloc(sizeof(WaveTransPhyPackage)*package_num);
   if (hander_data->packages_.package_ == NULL) {
     return NULL;
   }
@@ -58,21 +58,21 @@ WTSendLinkComparePackageS * WTSendLinkLayerGetPackageForCompare(WTSendLinkForCom
     memcpy(&one_package.byte_data_, ((unsigned char *)context + data_r_addr), COMPARE_FREQ_DATA_NUM);
     one_package.real_data_num_ = COMPARE_FREQ_DATA_NUM;
     WTLinkChecksumEncode(&one_package);
-    WTLinkPcakgeToPhyPack(&one_package, &hander_data->packages_.package_[i]);
+    WTLinkPackageEncode(&one_package, &hander_data->packages_.package_[i]);
     data_r_addr += COMPARE_FREQ_DATA_NUM;
   }
   if (context_len % COMPARE_FREQ_DATA_NUM != 0) {
     memcpy(&one_package.byte_data_, ((unsigned char *)context + data_r_addr), context_len % COMPARE_FREQ_DATA_NUM);
     one_package.real_data_num_ = context_len % COMPARE_FREQ_DATA_NUM;
     WTLinkChecksumEncode(&one_package);
-    WTLinkPcakgeToPhyPack(&one_package, &hander_data->packages_.package_[hander_data->packages_.package_num_ - 1]);
+    WTLinkPackageEncode(&one_package, &hander_data->packages_.package_[hander_data->packages_.package_num_ - 1]);
   }
   return &hander_data->packages_;
 }
 
-void WTSendLinkLayerReleasePackageForCompare(WTSendLinkForCompareHander * hander)
+void WTSendLinkLayerReleasePackage(WTSendLinkHander * hander)
 {
-  WTLinkSendHanderDataCompare *hander_data = (WTLinkSendHanderDataCompare *)hander->data_;
+  WTLinkSendHanderData *hander_data = (WTLinkSendHanderData *)hander->data_;
   free(hander_data->packages_.package_);
   hander_data->packages_.package_ = NULL;
 }

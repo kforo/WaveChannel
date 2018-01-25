@@ -7,24 +7,24 @@ typedef struct {
   WTFreqCodeType              st_mark_[COMPARE_FREQ_ST_NUM];
   WTFreqCodeType              byte_data_[COMPARE_FREQ_DATA_NUM];
   WTFreqCodeType              check_byte_data_[COMPARE_FREQ_CHECKSUM_NUM];
-}WaveTransComparePhyPackage;;
+}WaveTransPhyPackage;;
 
 typedef struct {
   int               real_data_num_;
   unsigned char    check_sum_[COMPARE_FREQ_CHECKSUM_NUM];
   unsigned char     byte_data_[COMPARE_FREQ_DATA_NUM];
-}WaveTransCompareLinkPackage;
+}WaveTransLinkPackage;
 
 
 int WTLinkCheckStCode(WTFreqCodeType code, int addr);
 
-int WTLinkChecksumDecode(WaveTransCompareLinkPackage *package);
+int WTLinkChecksumDecode(WaveTransLinkPackage *package);
 
-void WTLinkChecksumEncode(WaveTransCompareLinkPackage *package);
+void WTLinkChecksumEncode(WaveTransLinkPackage *package);
 
-void WTLinkPcakgeToPhyPack(const WaveTransCompareLinkPackage *package, WaveTransComparePhyPackage *phy_pack);
+void WTLinkPackageEncode(const WaveTransLinkPackage *package, WaveTransPhyPackage *phy_pack);
 
-void WTLinkPhyPcakgeToLinkPack(const WaveTransComparePhyPackage *package, WaveTransCompareLinkPackage *link_pack);
+void WTLinkPackageDecode(const WaveTransPhyPackage *package, WaveTransLinkPackage *link_pack);
 
 
 #endif

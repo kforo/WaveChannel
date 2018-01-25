@@ -4,13 +4,13 @@
 #include "proto_utils/wt_proto_common.h"
 
 
-int WTRecvPhyLayerInitForCompare();
+int WTRecvPhyLayerInit();
 
-void WTRecvPhyLayerExitForCompare();
+void WTRecvPhyLayerExit();
 
-void WTRecvPhyLayerSendPcmForCompare(const RecvAudioType *pcm, int pcm_len);
+void WTRecvPhyLayerSendPcm(const RecvAudioType *pcm, int pcm_len);
 
-int WTRecvPhuLayerGetDataForCompare(WTFreqCodeType *data_buf, int buf_len);
+int WTRecvPhuLayerGetData(WTFreqCodeType *data_buf, int buf_len);
 
 
 #endif

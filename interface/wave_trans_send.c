@@ -11,12 +11,14 @@
 extern "C" {
 #endif
 
+
+
 typedef struct {
-  WTSendLinkForCompareHander      *link_hander_;
-  WTSendPhyForCompareHander       *phy_hander_;
+  WTSendLinkHander      *link_hander_;
+  WTSendPhyHander       *phy_hander_;
   WaveTransPcmInfo                pcm_info_;
   WaveTransWavInfo                wav_info_;
-}WaveTransSendHanderDataForCompare;
+}WaveTransSendHanderData;
 
 
 static int WaveTransSendAttrCheck(WaveTransSendAttr *attr)
@@ -33,13 +35,13 @@ static int WaveTransSendAttrCheck(WaveTransSendAttr *attr)
   return 0;
 }
 
-static WaveTransSendHanderDataForCompare * WaveTransSendHanderDataInitCompare(WaveTransSendAttr *attr)
+static WaveTransSendHanderData * WaveTransSendHanderDataInit(WaveTransSendAttr *attr)
 {
-  WaveTransSendHanderDataForCompare *hander_data = (WaveTransSendHanderDataForCompare *)malloc(sizeof(WaveTransSendHanderDataForCompare));
+  WaveTransSendHanderData *hander_data = (WaveTransSendHanderData *)malloc(sizeof(WaveTransSendHanderData));
   if (hander_data == NULL) {
     return NULL;
   }
-  hander_data->link_hander_ = WTSendLinkLayerCreateHanderForCompare();
+  hander_data->link_hander_ = WTSendLinkLayerCreateHander();
   if (hander_data->link_hander_ == NULL) {
     free(hander_data);
     return NULL;
@@ -47,9 +49,9 @@ static WaveTransSendHanderDataForCompare * WaveTransSendHanderDataInitCompare(Wa
   WTSendPhyHanderAttr phy_attr;
   phy_attr.sample_bit_ = attr->sample_bit_;
   phy_attr.sample_rate_ = attr->sample_rate_;
-  hander_data->phy_hander_ = WTSendPhyLayerCreateHanderForCompare(&phy_attr);
+  hander_data->phy_hander_ = WTSendPhyLayerCreateHander(&phy_attr);
   if (hander_data->phy_hander_ == NULL) {
-    WTSendLinkLayerDestroyHanderForCompare(hander_data->link_hander_);
+    WTSendLinkLayerDestroyHander(hander_data->link_hander_);
     free(hander_data);
     return NULL;
   }
@@ -60,11 +62,11 @@ static WaveTransSendHanderDataForCompare * WaveTransSendHanderDataInitCompare(Wa
   return hander_data;
 }
 
-static void WaveTransSendHanderDataExitCompare(WaveTransSendHanderDataForCompare *hander_data)
+static void WaveTransSendHanderDataExit(WaveTransSendHanderData *hander_data)
 {
-  WTSendLinkLayerDestroyHanderForCompare(hander_data->link_hander_);
+  WTSendLinkLayerDestroyHander(hander_data->link_hander_);
   hander_data->link_hander_ = NULL;
-  WTSendPhyLayerDestroyHanderForCompare(hander_data->phy_hander_);
+  WTSendPhyLayerDestroyHander(hander_data->phy_hander_);
   hander_data->link_hander_ = NULL;
   if (hander_data->pcm_info_.pcm_buff_ != NULL) {
     free(hander_data->pcm_info_.pcm_buff_);
@@ -78,16 +80,16 @@ static void WaveTransSendHanderDataExitCompare(WaveTransSendHanderDataForCompare
 }
 
 
-static WaveTransPcmInfo * GetPcmCompare(WaveTransSendHander *hander, const void * context, int context_len)
+static WaveTransPcmInfo * GetPcm(WaveTransSendHander *hander, const void * context, int context_len)
 {
-  WaveTransSendHanderDataForCompare *hander_data = (WaveTransSendHanderDataForCompare *)hander->data_;
-  WTSendLinkComparePackageS *packages = WTSendLinkLayerGetPackageForCompare(hander_data->link_hander_, context, context_len);
+  WaveTransSendHanderData *hander_data = (WaveTransSendHanderData *)hander->data_;
+  WTSendLinkPackageS *packages = WTSendLinkLayerGetPackage(hander_data->link_hander_, context, context_len);
   if (packages == NULL) {
     return NULL;
   }
-  WTSendPcmBuffType *pcm_type = WTSendPhyLayerGetPcmCompare(hander_data->phy_hander_, packages);
+  WTSendPcmBuffType *pcm_type = WTSendPhyLayerGetPcm(hander_data->phy_hander_, packages);
   if (pcm_type == NULL) {
-    WTSendLinkLayerReleasePackageForCompare(hander_data->link_hander_);
+    WTSendLinkLayerReleasePackage(hander_data->link_hander_);
     return NULL;
   }
   if (hander_data->pcm_info_.pcm_buff_ != NULL) {
@@ -96,29 +98,29 @@ static WaveTransPcmInfo * GetPcmCompare(WaveTransSendHander *hander, const void 
   }
   hander_data->pcm_info_.pcm_buff_ = malloc(pcm_type->buff_len_);
   if (hander_data->pcm_info_.pcm_buff_ == NULL) {
-    WTSendPhyLayerReleasePcmCompare(hander_data->phy_hander_);
-    WTSendLinkLayerReleasePackageForCompare(hander_data->link_hander_);
+    WTSendPhyLayerReleasePcm(hander_data->phy_hander_);
+    WTSendLinkLayerReleasePackage(hander_data->link_hander_);
     return NULL;
   }
   memcpy(hander_data->pcm_info_.pcm_buff_, pcm_type->buff_, pcm_type->buff_len_);
   hander_data->pcm_info_.buff_len_ = pcm_type->buff_len_;
   hander_data->pcm_info_.sample_bit_ = pcm_type->sample_bit_;
   hander_data->pcm_info_.sample_rate_ = pcm_type->sample_rate_;
-  WTSendPhyLayerReleasePcmCompare(hander_data->phy_hander_);
-  WTSendLinkLayerReleasePackageForCompare(hander_data->link_hander_);
+  WTSendPhyLayerReleasePcm(hander_data->phy_hander_);
+  WTSendLinkLayerReleasePackage(hander_data->link_hander_);
   return &hander_data->pcm_info_;
 }
 
-WaveTransWavInfo * GetWavCompare(WaveTransSendHander * hander, const void * context, int context_len)
+WaveTransWavInfo * GetWav(WaveTransSendHander * hander, const void * context, int context_len)
 {
-  WaveTransSendHanderDataForCompare *hander_data = (WaveTransSendHanderDataForCompare *)hander->data_;
-  WTSendLinkComparePackageS *packages = WTSendLinkLayerGetPackageForCompare(hander_data->link_hander_, context, context_len);
+  WaveTransSendHanderData *hander_data = (WaveTransSendHanderData *)hander->data_;
+  WTSendLinkPackageS *packages = WTSendLinkLayerGetPackage(hander_data->link_hander_, context, context_len);
   if (packages == NULL) {
     return NULL;
   }
-  WTSendPcmBuffType *pcm_type = WTSendPhyLayerGetPcmCompare(hander_data->phy_hander_, packages);
+  WTSendPcmBuffType *pcm_type = WTSendPhyLayerGetPcm(hander_data->phy_hander_, packages);
   if (pcm_type == NULL) {
-    WTSendLinkLayerReleasePackageForCompare(hander_data->link_hander_);
+    WTSendLinkLayerReleasePackage(hander_data->link_hander_);
     return NULL;
   }
   int none_len = AUDIO_NONE_LEN(pcm_type->sample_rate_)*(pcm_type->sample_bit_ / 8);
@@ -126,8 +128,8 @@ WaveTransWavInfo * GetWavCompare(WaveTransSendHander * hander, const void * cont
   WTSendPcmBuffType temp_pcm_type;
   temp_pcm_type.buff_ = malloc(out_pcm_len);
   if (temp_pcm_type.buff_ == NULL) {
-    WTSendPhyLayerReleasePcmCompare(hander_data->phy_hander_);
-    WTSendLinkLayerReleasePackageForCompare(hander_data->link_hander_);
+    WTSendPhyLayerReleasePcm(hander_data->phy_hander_);
+    WTSendLinkLayerReleasePackage(hander_data->link_hander_);
     return NULL;
   }
   temp_pcm_type.buff_len_ = out_pcm_len;
@@ -136,8 +138,8 @@ WaveTransWavInfo * GetWavCompare(WaveTransSendHander * hander, const void * cont
   memset(temp_pcm_type.buff_, 0, none_len);
   memcpy(((unsigned char *)temp_pcm_type.buff_ + none_len), pcm_type->buff_, pcm_type->buff_len_);
   memset(((unsigned char *)temp_pcm_type.buff_ + none_len + pcm_type->buff_len_), 0, none_len);
-  WTSendPhyLayerReleasePcmCompare(hander_data->phy_hander_);
-  WTSendLinkLayerReleasePackageForCompare(hander_data->link_hander_);
+  WTSendPhyLayerReleasePcm(hander_data->phy_hander_);
+  WTSendLinkLayerReleasePackage(hander_data->link_hander_);
 
 
   if (hander_data->wav_info_.wav_buff_ != NULL) {
@@ -167,13 +169,13 @@ WaveTransSendHander * WaveTransSendCreateHander(WaveTransSendAttr * attr)
   if (WaveTransSendAttrCheck(attr) != 0) {
     return NULL;
   }
-  WaveTransSendHanderDataForCompare *hander_data = WaveTransSendHanderDataInitCompare(attr);
+  WaveTransSendHanderData *hander_data = WaveTransSendHanderDataInit(attr);
   if (hander_data == NULL) {
     return NULL;
   }
   WaveTransSendHander *hander = (WaveTransSendHander *)malloc(sizeof(WaveTransSendHander));
   if (hander == NULL) {
-    WaveTransSendHanderDataExitCompare(hander_data);
+    WaveTransSendHanderDataExit(hander_data);
     return NULL;
   }
   hander->data_ = hander_data;
@@ -182,18 +184,18 @@ WaveTransSendHander * WaveTransSendCreateHander(WaveTransSendAttr * attr)
 
 void WaveTransSendDestroyHander(WaveTransSendHander * hander)
 {
-  WaveTransSendHanderDataForCompare *hander_data = (WaveTransSendHanderDataForCompare *)hander->data_;
-  WaveTransSendHanderDataExitCompare(hander_data);
+  WaveTransSendHanderData *hander_data = (WaveTransSendHanderData *)hander->data_;
+  WaveTransSendHanderDataExit(hander_data);
   free(hander);
 }
 
 WaveTransPcmInfo * WaveTransSendGetPcm(WaveTransSendHander *hander, const void * context, int context_len)
 {
-  return GetPcmCompare(hander, context, context_len);
+  return GetPcm(hander, context, context_len);
 }
 WaveTransWavInfo * WaveTransSendGetWav(WaveTransSendHander * hander, const void * context, int context_len)
 {
-  return GetWavCompare(hander, context, context_len);
+  return GetWav(hander, context, context_len);
 }
 
 

@@ -20,7 +20,7 @@ int WTLinkCheckStCode(WTFreqCodeType code, int addr)
   return 1;
 }
 
-int WTLinkChecksumDecode(WaveTransCompareLinkPackage * package)
+int WTLinkChecksumDecode(WaveTransLinkPackage * package)
 {
   void *rs_hander = NULL;
   int eras_pos[COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM];
@@ -38,7 +38,7 @@ int WTLinkChecksumDecode(WaveTransCompareLinkPackage * package)
   return 1;
 }
 
-void WTLinkChecksumEncode(WaveTransCompareLinkPackage * package)
+void WTLinkChecksumEncode(WaveTransLinkPackage * package)
 {
   void *rs_hander = NULL;
   rs_hander = init_rs(RS_SYMSIZE, RS_GFPOLY, RS_FCR, RS_PRIM, COMPARE_FREQ_CHECKSUM_NUM / 2, ((1 << RS_SYMSIZE) - 1 - (package->real_data_num_ + COMPARE_FREQ_CHECKSUM_NUM / 2)));
@@ -49,7 +49,7 @@ void WTLinkChecksumEncode(WaveTransCompareLinkPackage * package)
   free_rs_cache();
 }
 
-void WTLinkPcakgeToPhyPack(const WaveTransCompareLinkPackage * package, WaveTransComparePhyPackage * phy_pack)
+void WTLinkPackageEncode(const WaveTransLinkPackage * package, WaveTransPhyPackage * phy_pack)
 {
   int i;
   for (i = 0; i < COMPARE_FREQ_ST_NUM; i++) {
@@ -66,7 +66,7 @@ void WTLinkPcakgeToPhyPack(const WaveTransCompareLinkPackage * package, WaveTran
   }
 }
 
-void WTLinkPhyPcakgeToLinkPack(const WaveTransComparePhyPackage * package, WaveTransCompareLinkPackage * link_pack)
+void WTLinkPackageDecode(const WaveTransPhyPackage * package, WaveTransLinkPackage * link_pack)
 {
   int i;
   link_pack->real_data_num_ = 0;

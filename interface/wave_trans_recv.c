@@ -8,11 +8,11 @@ extern "C" {
 
 int WaveTransRecvInit(void)
 {
-  if (WTRecvLinkLayerInitForCompare() != 0) {
+  if (WTRecvLinkLayerInit() != 0) {
     return -1;
   }
-  if (WTRecvPhyLayerInitForCompare() != 0) {
-    WTRecvLinkLayerExitForCompare();
+  if (WTRecvPhyLayerInit() != 0) {
+    WTRecvLinkLayerExit();
     return -1;
   }
   return 0;
@@ -20,18 +20,18 @@ int WaveTransRecvInit(void)
 
 void WaveTransRecvExit(void)
 {
-  WTRecvPhyLayerExitForCompare();
-  WTRecvLinkLayerExitForCompare();
+  WTRecvPhyLayerExit();
+  WTRecvLinkLayerExit();
 }
 
 void WaveTransRecvSetPcm(const RecvAudioType * pcm, int pcm_len)
 {
-  WTRecvPhyLayerSendPcmForCompare(pcm,pcm_len);
+  WTRecvPhyLayerSendPcm(pcm,pcm_len);
 }
 
 int WaveTransRecvGetContext(void * context, int context_len)
 {
-  return WTRecvLinkLayerGetDataForCompare(context, context_len);
+  return WTRecvLinkLayerGetData(context, context_len);
 }
 
 

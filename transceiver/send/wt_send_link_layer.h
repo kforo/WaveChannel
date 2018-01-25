@@ -5,21 +5,21 @@
 
 typedef struct {
   void          *data_;
-}WTSendLinkForCompareHander;
+}WTSendLinkHander;
 
 typedef struct {
   int                           package_num_;
-  WaveTransComparePhyPackage    *package_;
-}WTSendLinkComparePackageS;
+  WaveTransPhyPackage    *package_;
+}WTSendLinkPackageS;
 
 
 
-WTSendLinkForCompareHander * WTSendLinkLayerCreateHanderForCompare(void);
+WTSendLinkHander * WTSendLinkLayerCreateHander(void);
 
-void WTSendLinkLayerDestroyHanderForCompare(WTSendLinkForCompareHander *hander);
+void WTSendLinkLayerDestroyHander(WTSendLinkHander *hander);
 
-WTSendLinkComparePackageS *WTSendLinkLayerGetPackageForCompare(WTSendLinkForCompareHander *hander, const void *context, int context_len);
+WTSendLinkPackageS *WTSendLinkLayerGetPackage(WTSendLinkHander *hander, const void *context, int context_len);
 
-void WTSendLinkLayerReleasePackageForCompare(WTSendLinkForCompareHander *hander);
+void WTSendLinkLayerReleasePackage(WTSendLinkHander *hander);
 
 #endif

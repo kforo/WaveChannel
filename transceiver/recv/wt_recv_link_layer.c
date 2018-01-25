@@ -6,79 +6,79 @@
 #include <stdlib.h>
 #include <string.h>
 
-static WaveTransComparePhyPackage compare_package_temp_;
-static int package_compare_addr_ = 0;
+static WaveTransPhyPackage package_temp_;
+static int package_addr_ = 0;
 
-static int GetNextFreqCodePackage(WaveTransCompareLinkPackage *package)
+static int GetNextFreqCodePackage(WaveTransLinkPackage *package)
 {
   int ret;
-  if (package_compare_addr_ >= 0 && package_compare_addr_ < COMPARE_FREQ_ST_NUM) {    //find package start mark
+  if (package_addr_ >= 0 && package_addr_ < COMPARE_FREQ_ST_NUM) {    //find package start mark
     int loop_num = 10;
     while (loop_num--) {
       WTFreqCodeType temp;
-      ret = WTRecvPhuLayerGetDataForCompare(&temp, 1);
+      ret = WTRecvPhuLayerGetData(&temp, 1);
       if (ret <= 0) {
         break;
       }
-      if (WTLinkCheckStCode(temp, package_compare_addr_) != 1) {
-        package_compare_addr_ = 0;
+      if (WTLinkCheckStCode(temp, package_addr_) != 1) {
+        package_addr_ = 0;
       }
       else {
-        compare_package_temp_.st_mark_[package_compare_addr_] = temp;
-        package_compare_addr_++;
+        package_temp_.st_mark_[package_addr_] = temp;
+        package_addr_++;
       }
-      if (package_compare_addr_ == COMPARE_FREQ_ST_NUM) {
+      if (package_addr_ == COMPARE_FREQ_ST_NUM) {
         break;
       }
     }
   }
-  if (package_compare_addr_ >= COMPARE_FREQ_ST_NUM&&package_compare_addr_ < COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM) {     //read half_byte_data_
+  if (package_addr_ >= COMPARE_FREQ_ST_NUM&&package_addr_ < COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM) {     //read half_byte_data_
     int dst_addr = COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM;
-    ret = WTRecvPhuLayerGetDataForCompare(&compare_package_temp_.byte_data_[package_compare_addr_ - COMPARE_FREQ_ST_NUM], dst_addr - package_compare_addr_);
+    ret = WTRecvPhuLayerGetData(&package_temp_.byte_data_[package_addr_ - COMPARE_FREQ_ST_NUM], dst_addr - package_addr_);
     if (ret <= 0) {
       return -1;
     }
-    package_compare_addr_ += ret;
+    package_addr_ += ret;
   }
   /*read crc_half_byte_data_*/
-  if (package_compare_addr_ >= (COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM) && package_compare_addr_ < (COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM)) {
+  if (package_addr_ >= (COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM) && package_addr_ < (COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM)) {
     int dst_addr = COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM;
-    int addr_temp = package_compare_addr_ - (COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM);
-    ret = WTRecvPhuLayerGetDataForCompare(&compare_package_temp_.check_byte_data_[addr_temp], dst_addr - package_compare_addr_);
+    int addr_temp = package_addr_ - (COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM);
+    ret = WTRecvPhuLayerGetData(&package_temp_.check_byte_data_[addr_temp], dst_addr - package_addr_);
     if (ret <= 0) {
       return -1;
     }
-    package_compare_addr_ += ret;
+    package_addr_ += ret;
   }
   /*check one package*/
-  if (package_compare_addr_ == COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM) {
-    WaveTransCompareLinkPackage temp;
-    WTLinkPhyPcakgeToLinkPack(&compare_package_temp_, &temp);
+  if (package_addr_ == COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM) {
+    WaveTransLinkPackage temp;
+    WTLinkPackageDecode(&package_temp_, &temp);
     if (WTLinkChecksumDecode(&temp) != 1) {
-      package_compare_addr_ = 0;
+      package_addr_ = 0;
       return -1;
     }
-    memcpy(package, &temp, sizeof(WaveTransCompareLinkPackage));
-    package_compare_addr_ = 0;
+    memcpy(package, &temp, sizeof(WaveTransLinkPackage));
+    package_addr_ = 0;
     return 0;
   }
   return -1;
 }
 
-int WTRecvLinkLayerInitForCompare()
+int WTRecvLinkLayerInit()
 {
-  package_compare_addr_ = 0;
+  package_addr_ = 0;
   return 0;
 }
 
-void WTRecvLinkLayerExitForCompare()
+void WTRecvLinkLayerExit()
 {
-  package_compare_addr_ = 1;
+  package_addr_ = 1;
 }
 
-int WTRecvLinkLayerGetDataForCompare(void * buf, int buf_len)
+int WTRecvLinkLayerGetData(void * buf, int buf_len)
 {
-  WaveTransCompareLinkPackage one_package;
+  WaveTransLinkPackage one_package;
   int buf_w_addr = 0;
   while (buf_len - buf_w_addr >= COMPARE_FREQ_DATA_NUM) {
     if (GetNextFreqCodePackage(&one_package) != 0) {

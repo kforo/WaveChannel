@@ -3,10 +3,10 @@
 #include "proto_utils/wt_proto_physical_layer.h"
 
 
-int WTRecvLinkLayerInitForCompare();
+int WTRecvLinkLayerInit();
 
-void WTRecvLinkLayerExitForCompare();
+void WTRecvLinkLayerExit();
 
-int WTRecvLinkLayerGetDataForCompare(void *buf, int buf_len);
+int WTRecvLinkLayerGetData(void *buf, int buf_len);
 
 #endif

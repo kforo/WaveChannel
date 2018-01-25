@@ -6,20 +6,20 @@
 
 typedef struct {
   void      *data_;
-}WTSendPhyForCompareHander;
+}WTSendPhyHander;
 
 typedef struct {
   int           sample_rate_;
   int           sample_bit_;
 }WTSendPhyHanderAttr;
 
-WTSendPhyForCompareHander *WTSendPhyLayerCreateHanderForCompare(WTSendPhyHanderAttr *attr);
+WTSendPhyHander *WTSendPhyLayerCreateHander(WTSendPhyHanderAttr *attr);
 
-void WTSendPhyLayerDestroyHanderForCompare(WTSendPhyForCompareHander * hander);
+void WTSendPhyLayerDestroyHander(WTSendPhyHander * hander);
 
-WTSendPcmBuffType * WTSendPhyLayerGetPcmCompare(WTSendPhyForCompareHander *hander, WTSendLinkComparePackageS *packages);
+WTSendPcmBuffType * WTSendPhyLayerGetPcm(WTSendPhyHander *hander, WTSendLinkPackageS *packages);
 
-void WTSendPhyLayerReleasePcmCompare(WTSendPhyForCompareHander *hander);
+void WTSendPhyLayerReleasePcm(WTSendPhyHander *hander);
 
 
 #endif

@@ -17,13 +17,13 @@ static int WTGetPcmSize(int mark_num,int sample_rate)
   return time_ms_to_length(mark_num*ONE_FREQ_TIME_MS, sample_rate);
 }
 
-WTSendPhyForCompareHander * WTSendPhyLayerCreateHanderForCompare(WTSendPhyHanderAttr * attr)
+WTSendPhyHander * WTSendPhyLayerCreateHander(WTSendPhyHanderAttr * attr)
 {
   WTPhySendHanderData *hander_data = (WTPhySendHanderData *)malloc(sizeof(WTPhySendHanderData));
   if (hander_data == NULL) {
     return NULL;
   }
-  WTSendPhyForCompareHander *hander = (WTSendPhyForCompareHander *)malloc(sizeof(WTSendPhyForCompareHander));
+  WTSendPhyHander *hander = (WTSendPhyHander *)malloc(sizeof(WTSendPhyHander));
   if (hander == NULL) {
     free(hander_data);
     return NULL;
@@ -36,7 +36,7 @@ WTSendPhyForCompareHander * WTSendPhyLayerCreateHanderForCompare(WTSendPhyHander
   return hander;
 }
 
-void WTSendPhyLayerDestroyHanderForCompare(WTSendPhyForCompareHander * hander)
+void WTSendPhyLayerDestroyHander(WTSendPhyHander * hander)
 {
   WTPhySendHanderData *hander_data = (WTPhySendHanderData *)hander->data_;
   if (hander_data->pcm_info_.buff_ != NULL) {
@@ -47,7 +47,7 @@ void WTSendPhyLayerDestroyHanderForCompare(WTSendPhyForCompareHander * hander)
   free(hander);
 }
 
-WTSendPcmBuffType * WTSendPhyLayerGetPcmCompare(WTSendPhyForCompareHander * hander, WTSendLinkComparePackageS * packages)
+WTSendPcmBuffType * WTSendPhyLayerGetPcm(WTSendPhyHander * hander, WTSendLinkPackageS * packages)
 {
   int one_package_size = COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM;
   int marks_num = one_package_size * packages->package_num_;
@@ -78,7 +78,7 @@ WTSendPcmBuffType * WTSendPhyLayerGetPcmCompare(WTSendPhyForCompareHander * hand
   return &hander_data->pcm_info_;
 }
 
-void WTSendPhyLayerReleasePcmCompare(WTSendPhyForCompareHander * hander)
+void WTSendPhyLayerReleasePcm(WTSendPhyHander * hander)
 {
   WTPhySendHanderData *hander_data = (WTPhySendHanderData *)hander->data_;
   free(hander_data->pcm_info_.buff_);
