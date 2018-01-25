@@ -12,14 +12,16 @@
 
 static WTFreqCodeType freq_code_st_mark_[COMPARE_FREQ_ST_NUM] = COMPARE_ST_CODE;
 
-int WTLinkCheckStCode(WTFreqCodeType *code, int len)
+int WTLinkCheckStCode(unsigned char *code, int len)
 {
   if (len != COMPARE_FREQ_ST_NUM) {
     return 0;
   }
   int i;
+  unsigned temp;
   for (i = 0; i < len; i++) {
-    if (code[i] != freq_code_st_mark_[i]) {
+    temp = (code[i] >> COMPARE_DATA_NUM_LEN);
+    if (temp != freq_code_st_mark_[i]) {
       return 0;
     }
   }
@@ -59,14 +61,15 @@ void WTLinkChecksumEncode(WaveTransLinkPackage * package)
 void WTLinkPackageEncode(const WaveTransLinkPackage * package, WaveTransPhyPackage * phy_pack)
 {
   int i;
+  unsigned char data_len = (unsigned char)package->real_data_num_;
   for (i = 0; i < COMPARE_FREQ_ST_NUM; i++) {
     phy_pack->st_mark_[i] = freq_code_st_mark_[i];
+    phy_pack->st_mark_[i] <<= COMPARE_DATA_NUM_LEN;
+    phy_pack->st_mark_[i] += data_len - 1;
   }
+  memset(phy_pack->byte_data_, 0, sizeof(WTFreqCodeType)*COMPARE_FREQ_DATA_NUM);
   for (i = 0; i < package->real_data_num_; i++) {
     phy_pack->byte_data_[i] = package->byte_data_[i];
-  }
-  for (; i < COMPARE_FREQ_DATA_NUM; i++) {
-    phy_pack->byte_data_[i] = COMPARE_FREQ_NONE;
   }
   for (i = 0; i < COMPARE_FREQ_CHECKSUM_NUM; i++) {
     phy_pack->check_byte_data_[i] = package->check_sum_[i];
@@ -76,13 +79,11 @@ void WTLinkPackageEncode(const WaveTransLinkPackage * package, WaveTransPhyPacka
 void WTLinkPackageDecode(const WaveTransPhyPackage * package, WaveTransLinkPackage * link_pack)
 {
   int i;
-  link_pack->real_data_num_ = 0;
-  for (i = 0; i < COMPARE_FREQ_DATA_NUM; i++) {
-    if (package->byte_data_[i] == COMPARE_FREQ_NONE) {
-      break;
-    }
-    link_pack->byte_data_[link_pack->real_data_num_] = (unsigned char)package->byte_data_[i];
-    link_pack->real_data_num_++;
+  for (i = 0; i < COMPARE_FREQ_ST_NUM; i++) {
+    link_pack->real_data_num_ = (0x0003 & package->st_mark_[i]) + 1;
+  }
+  for (i = 0; i < link_pack->real_data_num_; i++) {
+    link_pack->byte_data_[i] = (unsigned char)package->byte_data_[i];
   }
   for (i = 0; i < COMPARE_FREQ_CHECKSUM_NUM; i++) {
     link_pack->check_sum_[i] = (unsigned char)package->check_byte_data_[i];

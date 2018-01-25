@@ -4,9 +4,9 @@
 #include "wt_proto_physical_layer.h"
 
 typedef struct {
-  WTFreqCodeType              st_mark_[COMPARE_FREQ_ST_NUM];
-  WTFreqCodeType              byte_data_[COMPARE_FREQ_DATA_NUM];
-  WTFreqCodeType              check_byte_data_[COMPARE_FREQ_CHECKSUM_NUM];
+  unsigned char              st_mark_[COMPARE_FREQ_ST_NUM];
+  unsigned char              byte_data_[COMPARE_FREQ_DATA_NUM];
+  unsigned char              check_byte_data_[COMPARE_FREQ_CHECKSUM_NUM];
 }WaveTransPhyPackage;
 
 typedef struct {
@@ -16,7 +16,7 @@ typedef struct {
 }WaveTransLinkPackage;
 
 
-int WTLinkCheckStCode(WTFreqCodeType *code, int len);
+int WTLinkCheckStCode(unsigned char *code, int len);
 
 int WTLinkChecksumDecode(WaveTransLinkPackage *package);
 
