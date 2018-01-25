@@ -9,51 +9,8 @@
 #define RS_FCR				1
 #define RS_PRIM				1
 
-static WTPhyFreqMarkType proto_st_mark_[START_FREQ_NUM] = START_FREQ_MARK;
+
 static WTFreqCodeType freq_code_st_mark_[COMPARE_FREQ_ST_NUM] = COMPARE_ST_CODE;
-
-static void SetPackageStMark(WTPhyFreqMarkType *mark_data)
-{
-  int i;
-  for (i = 0; i < START_FREQ_NUM; i++) {
-    mark_data[i] = proto_st_mark_[i];
-  }
-}
-
-void WTLinkGetDataChecksum(WaveTransLinkPackage *package)
-{
-  void *rs_hander = NULL;
-  rs_hander = init_rs(RS_SYMSIZE, RS_GFPOLY, RS_FCR, RS_PRIM, HBYTE_CHECKSUM_NUM/2, ((1 << RS_SYMSIZE) - 1 - (package->real_data_num_ + HBYTE_CHECKSUM_NUM/2)));
-  if (rs_hander == NULL) {
-    return;
-  }
-  encode_rs_char(rs_hander, (data_t *)package->byte_data_, (data_t *)(&package->check_sum_));
-  free_rs_cache();
-}
-
-
-void WTLinkPackageToHalf(const WaveTransLinkPackage * package, WaveTransPhyPackage * half_package)
-{
-  SetPackageStMark(half_package->st_mark_);
-  int i, j = 0;
-  for (i = 0; i < package->real_data_num_; i++) {
-    half_package->half_byte_data_[j] = package->byte_data_[i] & 0x0f;
-    half_package->half_byte_data_[j + 1] = (package->byte_data_[i] & 0xf0) >> 4;
-    j += 2;
-  }
-  for (; i < HBYTE_DATA_NUM / 2; i++) {
-    half_package->half_byte_data_[j] = NONE_MAEK;
-    half_package->half_byte_data_[j + 1] = NONE_MAEK;
-    j += 2;
-  }
-  j = 0;
-  unsigned char *temp = (unsigned char *)(&package->check_sum_);
-  for (i = 0; i < HBYTE_CHECKSUM_NUM / 2; i++) {
-    half_package->check_half_byte_data_[j] = temp[i] & 0x0f;
-    half_package->check_half_byte_data_[j + 1] = (temp[i] & 0xf0) >> 4;
-    j += 2;
-  }
-}
 
 int WTLinkCheckStCode(WTFreqCodeType code, int addr)
 {
@@ -123,53 +80,4 @@ void WTLinkPhyPcakgeToLinkPack(const WaveTransComparePhyPackage * package, WaveT
   for (i = 0; i < COMPARE_FREQ_CHECKSUM_NUM; i++) {
     link_pack->check_sum_[i] = (unsigned char)package->check_byte_data_[i];
   }
-}
-
-void WTLinkHalfPackageToByte(WaveTransPhyPackage * half_package, WaveTransLinkPackage * package)
-{
-  int i, j = 0;
-  for (i = 0; i < HBYTE_DATA_NUM / 2; i++) {
-    if (half_package->half_byte_data_[j] == NONE_MAEK) {
-      break;
-    }
-    package->byte_data_[i] = 0x00;
-    package->byte_data_[i] = half_package->half_byte_data_[j];
-    package->byte_data_[i] += half_package->half_byte_data_[j + 1]<<4;
-    j += 2;
-  }
-  package->real_data_num_ = i;
-  unsigned char *temp = (unsigned char *)(&package->check_sum_);
-  j = 0;
-  for (i = 0; i < HBYTE_CHECKSUM_NUM / 2; i++) {
-    temp[i] = 0x00;
-    temp[i] = half_package->check_half_byte_data_[j];
-    temp[i] += half_package->check_half_byte_data_[j + 1]<<4;
-    j += 2;
-  }
-}
-
-int WTLinkCheckStMark(WTPhyFreqMarkType st_mark, int mark_num)
-{
-  if (st_mark != proto_st_mark_[mark_num]) {
-    return 0;
-  }
-  return 1;
-}
-
-int WTLinkChecksumOk(WaveTransLinkPackage * package)
-{
-  void *rs_hander = NULL;
-  int eras_pos[HBYTE_DATA_NUM / 2 + HBYTE_CHECKSUM_NUM / 2];
-  unsigned char buff[HBYTE_DATA_NUM / 2 + HBYTE_CHECKSUM_NUM / 2] = { 0 };
-  memset(eras_pos, 0, sizeof(int)*(HBYTE_DATA_NUM / 2) + HBYTE_CHECKSUM_NUM/2);
-  rs_hander = init_rs(RS_SYMSIZE, RS_GFPOLY, RS_FCR, RS_PRIM, HBYTE_CHECKSUM_NUM / 2, ((1 << RS_SYMSIZE) - 1 - (package->real_data_num_ + HBYTE_CHECKSUM_NUM / 2)));
-  if (rs_hander == NULL) {
-    return 1;
-  }
-  memcpy(buff, package->byte_data_, package->real_data_num_);
-  memcpy(buff + package->real_data_num_, &package->check_sum_, HBYTE_CHECKSUM_NUM / 2);
-  decode_rs_char(rs_hander, buff, eras_pos, 0);
-  memcpy(package->byte_data_, buff, package->real_data_num_);
-  free_rs_cache();
-  return 1;
 }

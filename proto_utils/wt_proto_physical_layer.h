@@ -19,13 +19,6 @@ typedef struct {
   double      right_phase_[COMPARE_FREQ_BIT+COMPARE_FREQ_PARITY_BIT];
 }RefPhaseInfo;
 
-
-
-
-int WTPhysicalPcmToFreqMark(const RecvAudioType *pcm_buf, int pcm_len, WTPhyFreqMarkType *freq_mark);
-
-int WTPhysicalFreqMarkToPcm(WTPhyFreqMarkType freq_mark, void  *pcm_buf, int pcm_len,int sample_bit,int sample_rate);
-
 int WTPhyAnalysisNumToRealNum(int ana_num);
 
 int WTPhysicalPcmDecode(const RecvAudioType *pcm_buf, int pcm_len, WTFreqCodeType *code);

@@ -2,18 +2,9 @@
 #define __WT_PROTO_COMMON_H__
 
 /*global config*/
-//#define FREQ_MODE_MUX
-#define FREQ_MODE_COMPARE
-typedef unsigned char WTPhyFreqMarkType;
 
 typedef unsigned short WTFreqCodeType;
 
-#define FREQ_LIST_LEN           (18)
-#define START_FREQ_NUM                  (2)
-#define HBYTE_DATA_NUM                  (8)
-#define HBYTE_CHECKSUM_NUM              (4)
-#define START_FREQ_MARK                  {16,17}
-#define NONE_MAEK                        (17)
 #define ONE_FREQ_TIME_MS                 (24)
 #define time_ms_to_length(time_ms,sample_rate)          (((time_ms)*(sample_rate))/1000)
 
@@ -32,6 +23,7 @@ typedef struct {
 }CompareFreqNode;
 
 extern CompareFreqNode compare_freq_list_[];
+#define MAX_FREQ                  (7250)
 
 
 /*recv side config*/
