@@ -8,16 +8,6 @@ extern "C" {
 
 int WaveTransRecvInit(void)
 {
-#ifdef FREQ_MODE_MUX
-  if (WTRecvLinkLayerInitForMix() != 0) {
-    return -1;
-  }
-  if (WTRecvPhyLayerInitForMixing() != 0) {
-    WTRecvLinkLayerExitForMix();
-    return -1;
-  }
-  return 0;
-#else
 #ifdef FREQ_MODE_COMPARE
   if (WTRecvLinkLayerInitForCompare() != 0) {
     return -1;
@@ -37,15 +27,10 @@ int WaveTransRecvInit(void)
   }
   return 0;
 #endif
-#endif
 }
 
 void WaveTransRecvExit(void)
 {
-#ifdef FREQ_MODE_MUX
-  WTRecvPhyLayerExitForMixing();
-  WTRecvLinkLayerExitForMix();
-#else
 #ifdef FREQ_MODE_COMPARE
   WTRecvPhyLayerExitForCompare();
   WTRecvLinkLayerExitForCompare();
@@ -53,32 +38,23 @@ void WaveTransRecvExit(void)
   WTRecvPhyLayerExit();
   WTRecvLinkLayerExit();
 #endif
-#endif
 }
 
 void WaveTransRecvSetPcm(const RecvAudioType * pcm, int pcm_len)
 {
-#ifdef FREQ_MODE_MUX
-  WTRecvPhyLayerSendPcmForMixing(pcm, pcm_len);
-#else
 #ifdef FREQ_MODE_COMPARE
   WTRecvPhyLayerSendPcmForCompare(pcm,pcm_len);
 #else
   WTRecvPhyLayerSendPcm(pcm, pcm_len);
 #endif
-#endif
 }
 
 int WaveTransRecvGetContext(void * context, int context_len)
 {
-#ifdef FREQ_MODE_MUX
-  return WTRecvLinkLayerGetDataForMix(context, context_len);
-#else
 #ifdef FREQ_MODE_COMPARE
   return WTRecvLinkLayerGetDataForCompare(context, context_len);
 #else
   return WTRecvLinkLayerGetData(context, context_len);
-#endif
 #endif
 }
 

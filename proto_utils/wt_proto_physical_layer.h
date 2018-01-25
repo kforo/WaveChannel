@@ -13,12 +13,6 @@ typedef struct {
   int           sample_bit_;
 }WTSendPcmBuffType;
 
-
-typedef struct {
-  unsigned char                   freq_mark_num_;
-  WTPhyFreqMarkType               marks_[MIXING_FREQ_NUM];
-}WaveTransMixMarksType;
-
 typedef struct {
   int         bit_num_;
   double      left_phase_[COMPARE_FREQ_BIT+COMPARE_FREQ_PARITY_BIT];
@@ -31,10 +25,6 @@ typedef struct {
 int WTPhysicalPcmToFreqMark(const RecvAudioType *pcm_buf, int pcm_len, WTPhyFreqMarkType *freq_mark);
 
 int WTPhysicalFreqMarkToPcm(WTPhyFreqMarkType freq_mark, void  *pcm_buf, int pcm_len,int sample_bit,int sample_rate);
-
-int WTPhysicalPcmToFreqMarks(const RecvAudioType *pcm_buf, int pcm_len, WaveTransMixMarksType *freq_marks);
-
-int WTPhysicalFreqMarksToPcm(const WaveTransMixMarksType *freq_marks, void *pcm_buf, int pcm_len, int sample_bit, int sample_rate);
 
 int WTPhyAnalysisNumToRealNum(int ana_num);
 
