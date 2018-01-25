@@ -8,14 +8,15 @@ typedef unsigned short WTFreqCodeType;
 #define ONE_FREQ_TIME_MS                 (24)
 #define time_ms_to_length(time_ms,sample_rate)          (((time_ms)*(sample_rate))/1000)
 
-#define COMPARE_FREQ_ST_NUM                 (2)
+#define COMPARE_FREQ_ST_NUM                 (1)
 #define COMPARE_FREQ_DATA_NUM               (4)
-#define COMPARE_FREQ_CHECKSUM_NUM           (2)
+#define COMPARE_FREQ_DATA_BIT               (8)
+#define COMPARE_FREQ_CHECKSUM_NUM           (4)
 #define COMPARE_FREQ_NUM                    (18)
 #define COMPARE_FREQ_BIT                    (9)
 #define COMPARE_FREQ_PARITY_BIT              (1)
-#define COMPARE_FREQ_NONE                    (0x0103)
-#define COMPARE_ST_CODE                     {0x1aa,0x155}
+#define COMPARE_FREQ_NONE                    (0x00)
+#define COMPARE_ST_CODE                     {0xD0}
 typedef struct {
   int left_freq_;
   int right_freq_;

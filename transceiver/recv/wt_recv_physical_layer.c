@@ -152,7 +152,7 @@ void WTRecvPhyLayerSendPcm(const RecvAudioType * pcm, int pcm_len)
   }
 }
 
-int WTRecvPhuLayerGetData(WTFreqCodeType * data_buf, int buf_len)
+int WTRecvPhyLayerGetData(WTFreqCodeType * data_buf, int buf_len)
 {
   int i;
   for (i = 0; i < buf_len; i++) {

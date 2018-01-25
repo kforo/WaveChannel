@@ -12,10 +12,16 @@
 
 static WTFreqCodeType freq_code_st_mark_[COMPARE_FREQ_ST_NUM] = COMPARE_ST_CODE;
 
-int WTLinkCheckStCode(WTFreqCodeType code, int addr)
+int WTLinkCheckStCode(WTFreqCodeType *code, int len)
 {
-  if (code != freq_code_st_mark_[addr]) {
+  if (len != COMPARE_FREQ_ST_NUM) {
     return 0;
+  }
+  int i;
+  for (i = 0; i < len; i++) {
+    if (code[i] != freq_code_st_mark_[i]) {
+      return 0;
+    }
   }
   return 1;
 }
@@ -41,7 +47,8 @@ int WTLinkChecksumDecode(WaveTransLinkPackage * package)
 void WTLinkChecksumEncode(WaveTransLinkPackage * package)
 {
   void *rs_hander = NULL;
-  rs_hander = init_rs(RS_SYMSIZE, RS_GFPOLY, RS_FCR, RS_PRIM, COMPARE_FREQ_CHECKSUM_NUM / 2, ((1 << RS_SYMSIZE) - 1 - (package->real_data_num_ + COMPARE_FREQ_CHECKSUM_NUM / 2)));
+  rs_hander = init_rs(RS_SYMSIZE, RS_GFPOLY, RS_FCR, RS_PRIM, COMPARE_FREQ_CHECKSUM_NUM,
+    ((1 << RS_SYMSIZE) - 1 - (package->real_data_num_ + COMPARE_FREQ_CHECKSUM_NUM)));
   if (rs_hander == NULL) {
     return;
   }
@@ -80,4 +87,64 @@ void WTLinkPackageDecode(const WaveTransPhyPackage * package, WaveTransLinkPacka
   for (i = 0; i < COMPARE_FREQ_CHECKSUM_NUM; i++) {
     link_pack->check_sum_[i] = (unsigned char)package->check_byte_data_[i];
   }
+}
+
+
+void WTLinkFreqCodeWriteToPhyPackage(WTFreqCodeType code, WaveTransPhyPackage *package)
+{
+  int i;
+  int j = 0;
+  for (i = 0; i < COMPARE_FREQ_CHECKSUM_NUM; i++) {
+    package->check_byte_data_[i] <<= 1;
+    if (code&(0x0001 << j)) {
+      package->check_byte_data_[i] |= 0x0001;
+    }
+    j++;
+    package->check_byte_data_[i] &= ~(0x0001 << COMPARE_FREQ_BIT);
+  }
+  for (i = 0; i < COMPARE_FREQ_DATA_NUM; i++) {
+    package->byte_data_[i] <<= 1;
+    if (code&(0x0001 << j)) {
+      package->byte_data_[i] |= 0x0001;
+    }
+    j++;
+    package->byte_data_[i] &= ~(0x0001 << COMPARE_FREQ_BIT);
+  }
+  for (i = 0; i < COMPARE_FREQ_ST_NUM; i++) {
+    package->st_mark_[i] <<= 1;
+    if (code&(0x0001 << j)) {
+      package->st_mark_[i] |= 0x0001;
+    }
+    j++;
+    package->st_mark_[i] &= ~(0x0001 << COMPARE_FREQ_BIT);
+  }
+
+}
+
+int WTLinkFreqCodeReadFromPhyPackage(const WaveTransPhyPackage * package, WTFreqCodeType * code, int code_len)
+{
+  if (code_len != COMPARE_FREQ_DATA_BIT) {
+    return -1;
+  }
+  memset(code, 0, sizeof(WTFreqCodeType)*COMPARE_FREQ_DATA_BIT);
+  int i;
+  int j;
+  for (j = 0; j < COMPARE_FREQ_DATA_BIT; j++) {
+    for (i = 0; i < COMPARE_FREQ_CHECKSUM_NUM; i++) {
+      if (package->check_byte_data_[i] & (0x0001 << j)) {
+        code[j] |= (0x0001 << i);
+      }
+    }
+    for (i = 0; i < COMPARE_FREQ_DATA_NUM; i++) {
+      if (package->byte_data_[i] & (0x0001 << j)) {
+        code[j] |= (0x0001 << (i + COMPARE_FREQ_CHECKSUM_NUM));
+      }
+    }
+    for (i = 0; i < COMPARE_FREQ_ST_NUM; i++) {
+      if (package->st_mark_[i] & (0x0001 << j)) {
+        code[j] |= (0x0001 << (i + COMPARE_FREQ_CHECKSUM_NUM + COMPARE_FREQ_DATA_NUM));
+      }
+    }
+  }
+  return 0;
 }

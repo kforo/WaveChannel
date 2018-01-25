@@ -49,14 +49,15 @@ void WTSendPhyLayerDestroyHander(WTSendPhyHander * hander)
 
 WTSendPcmBuffType * WTSendPhyLayerGetPcm(WTSendPhyHander * hander, WTSendLinkPackageS * packages)
 {
-  int one_package_size = COMPARE_FREQ_ST_NUM + COMPARE_FREQ_DATA_NUM + COMPARE_FREQ_CHECKSUM_NUM;
+  int one_package_size = COMPARE_FREQ_DATA_BIT;
   int marks_num = one_package_size * packages->package_num_;
   WTPhySendHanderData *hander_data = (WTPhySendHanderData *)hander->data_;
   hander_data->pcm_info_.buff_ = malloc((hander_data->sample_bit_ / 8)*WTGetPcmSize(marks_num, hander_data->sample_rate_));
   if (hander_data->pcm_info_.buff_ == NULL) {
     return NULL;
   }
-  WTFreqCodeType *temp;
+  WTFreqCodeType temp[COMPARE_FREQ_DATA_BIT];
+  int temp_len = COMPARE_FREQ_DATA_BIT;
   RefPhaseInfo ref_phase;
   ref_phase.bit_num_ = COMPARE_FREQ_BIT;
   memset(&ref_phase.left_phase_, 0, sizeof(double)*COMPARE_FREQ_BIT);
@@ -65,8 +66,8 @@ WTSendPcmBuffType * WTSendPhyLayerGetPcm(WTSendPhyHander * hander, WTSendLinkPac
   int i, j;
   int one_freq_pcm_size = WTGetPcmSize(1, hander_data->sample_rate_)*(hander_data->sample_bit_ / 8);
   for (i = 0; i < packages->package_num_; i++) {
-    temp = (WTFreqCodeType *)(&packages->package_[i]);
-    for (j = 0; j < one_package_size; j++) {
+    WTLinkFreqCodeReadFromPhyPackage(&packages->package_[i], temp, temp_len);
+    for (j = temp_len-1; j >= 0; j--) {
       WTPhysicalPcmEncode(temp[j], (unsigned char *)hander_data->pcm_info_.buff_ + pcm_w_addr,
         one_freq_pcm_size, &ref_phase, hander_data->sample_bit_, hander_data->sample_rate_);
       pcm_w_addr += one_freq_pcm_size;
