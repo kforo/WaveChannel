@@ -1,3 +1,11 @@
+/*
+#
+# Copyright 2018, sohu ipc
+# author: ChenFawang
+# main.cc
+# 2018-01-26
+# mail: fawangchen@sohu-inc.com
+*/
 #ifndef __RING_BUFF_H__
 #define __RING_BUFF_H__
 

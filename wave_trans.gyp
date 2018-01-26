@@ -1,8 +1,10 @@
 #
-# copyright 2017, sohu inc
-# author: chfw
-# wave_trans.gyp
-# 2017-06-05
+#
+# Copyright 2018, sohu ipc
+# author: ChenFawang
+# main.cc
+# 2018-01-26
+# mail: fawangchen@sohu-inc.com
 #
 {   
     'variables': {

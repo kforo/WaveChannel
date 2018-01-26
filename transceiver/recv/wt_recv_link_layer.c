@@ -1,3 +1,11 @@
+/*
+#
+# Copyright 2018, sohu ipc
+# author: ChenFawang
+# main.cc
+# 2018-01-26
+# mail: fawangchen@sohu-inc.com
+*/
 #include "wt_recv_link_layer.h"
 #include "proto_utils/wt_proto_link_layer.h"
 #include "wt_recv_physical_layer.h"

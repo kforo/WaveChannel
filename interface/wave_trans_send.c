@@ -1,3 +1,11 @@
+/*
+#
+# Copyright 2018, sohu ipc
+# author: ChenFawang
+# main.cc
+# 2018-01-26
+# mail: fawangchen@sohu-inc.com
+*/
 #include "wave_trans_send.h"
 #include "transceiver/send/wt_send_link_layer.h"
 #include "transceiver/send/wt_send_physical_layer.h"

@@ -1,3 +1,11 @@
+/*
+#
+# Copyright 2018, sohu ipc
+# author: ChenFawang
+# main.cc
+# 2018-01-26
+# mail: fawangchen@sohu-inc.com
+*/
 #include "wt_proto_link_layer.h"
 #include "checksum_utils/crc_codec.h"
 #include "checksum_utils/rs_code.h"

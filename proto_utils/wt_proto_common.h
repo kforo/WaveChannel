@@ -1,3 +1,11 @@
+/*
+#
+# Copyright 2018, sohu ipc
+# author: ChenFawang
+# main.cc
+# 2018-01-26
+# mail: fawangchen@sohu-inc.com
+*/
 #ifndef __WT_PROTO_COMMON_H__
 #define __WT_PROTO_COMMON_H__
 
