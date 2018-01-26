@@ -4,12 +4,16 @@
 #include "interface/wave_trans_send.h"
 #include "audio_codec/pcm_to_wav.h"
 
+#ifdef WIN32
+#include <crtdbg.h>
+#endif
+
 
 int main(void)
 {
   int ret;
   FILE *fp = NULL;
-  char test_context[] = "1234567890abcdefghijklmnopqrstuvwxyz\n";
+  char test_context[] = "\n\r\n\r'Z\n'uH:\n_Z'ZZZ,H5C~$:'Z,C\n3\\J05$?55\n1516884990339\nipc\n88888888\r\n\r\n";
   WaveTransSendHander *wt_send_hander = NULL;
   WaveTransSendAttr attr;
   attr.sample_bit_ = 16;
@@ -58,5 +62,8 @@ int main(void)
   }
   fclose(fp);
   WaveTransSendDestroyHander(wt_send_hander);
+#ifdef WIN32
+  _CrtDumpMemoryLeaks();
+#endif
   return 0;
 }
