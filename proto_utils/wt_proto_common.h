@@ -15,6 +15,7 @@ typedef unsigned short WTFreqCodeType;
 
 #define ONE_FREQ_TIME_MS                 (24)
 #define time_ms_to_length(time_ms,sample_rate)          (((time_ms)*(sample_rate))/1000)
+#define sample_len_to_time_ms(sample_len,sample_rate)   ((sample_len*1000)/(sample_rate))
 
 #define COMPARE_FREQ_ST_NUM                 (1)
 #define COMPARE_FREQ_DATA_NUM               (4)
@@ -51,8 +52,10 @@ typedef short   RecvAudioType;
 
 /*send side config*/
 #define  AUDIO_AMPLITUDE_SCALE            (35)  //AUDIO_AMPLITUDE_SCALE/100 * max value
-#define  AUDIO_NONE_TIME_MS               (200)
-#define  AUDIO_NONE_LEN(sample_rate)      ((AUDIO_NONE_TIME_MS*(sample_rate))/1000)
+#define  AUDIO_PREFIX_TIME_MS               (1000)
+#define  AUDIO_SUFFIX_TIME_MS               (200)
+#define  AUDIO_PREFIX_LEN(sample_rate)    ((AUDIO_PREFIX_TIME_MS*(sample_rate))/1000)
+#define  AUDIO_SUFFIX_LEN(sample_rate)    ((AUDIO_SUFFIX_TIME_MS*(sample_rate))/1000)
 
 
 

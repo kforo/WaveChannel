@@ -55,10 +55,15 @@ int main()
   RefPhaseInfo ref_phase;
   memset(&ref_phase, 0, sizeof(RefPhaseInfo));
   int i;
+  WTSendPcmBuffType pcm_type;
+  pcm_type.sample_bit_ = 16;
+  pcm_type.sample_rate_ = 16000;
   for (i = 0; i < 512; i++) {
     mark = i;
    // mark = 2;
-    if (WTPhysicalPcmEncode(mark, pcm_buf, sizeof(short)*buf_len, &ref_phase, 16, 16000) != 0) {
+    pcm_type.buff_ = pcm_buf;
+    pcm_type.buff_len_ = sizeof(short)*buf_len;
+    if (WTPhysicalPcmEncode(mark, &pcm_type, &ref_phase) != 0) {
       fclose(fp);
       return 1;
     }

@@ -98,12 +98,12 @@ static void CreatePluralFreqsForFreqCode(int nfft, const FreqEncodeInfo *freqs_i
   }
 }
 
-static int EncodeSoundMixingForFreqCode(const FreqEncodeInfo *freqs_info, void *buffer, int buffer_length, int sample_bit, int sample_rate)
+static int EncodeSoundMixingForFreqCode(const FreqEncodeInfo *freqs_info, WTSendPcmBuffType *pcm)
 {
   kiss_fftr_cfg fftr_cfg = NULL;
   kiss_fft_cpx *in_data = NULL;
   float *out_data = NULL;
-  int pcm_num = buffer_length / (sample_bit / 8);
+  int pcm_num = pcm->buff_len_ / (pcm->sample_bit_ / 8);
   int in_data_num = (pcm_num / 2) + 1;
   fftr_cfg = kiss_fftr_alloc(pcm_num, 1, NULL, NULL);
   if (fftr_cfg == NULL) {
@@ -115,7 +115,7 @@ static int EncodeSoundMixingForFreqCode(const FreqEncodeInfo *freqs_info, void *
     return -1;
   }
   int amplitude;
-  switch (sample_bit) {
+  switch (pcm->sample_bit_) {
     case 8:amplitude = (127 * AUDIO_AMPLITUDE_SCALE) / 100; break;
     case 16:amplitude = (32767 * AUDIO_AMPLITUDE_SCALE) / 100; break;
     default:
@@ -123,7 +123,7 @@ static int EncodeSoundMixingForFreqCode(const FreqEncodeInfo *freqs_info, void *
       KISS_FFT_FREE(fftr_cfg);
       return -1;
   }
-  CreatePluralFreqsForFreqCode(in_data_num, freqs_info, in_data, sample_rate, amplitude);
+  CreatePluralFreqsForFreqCode(in_data_num, freqs_info, in_data, pcm->sample_rate_, amplitude);
   out_data = (float*)malloc(sizeof(float)*pcm_num);
   if (out_data == NULL) {
     free(in_data);
@@ -133,9 +133,9 @@ static int EncodeSoundMixingForFreqCode(const FreqEncodeInfo *freqs_info, void *
   kiss_fftri(fftr_cfg, in_data, out_data);
   int i;
   for (i = 0; i < pcm_num; i++) {
-    switch (sample_bit) {
-      case 8: ((signed char *)buffer)[i] = (signed char)out_data[i]; break;
-      case 16: ((short *)buffer)[i] = (short)out_data[i]; break;
+    switch (pcm->sample_bit_) {
+      case 8: ((signed char *)pcm->buff_)[i] = (signed char)out_data[i]; break;
+      case 16: ((short *)pcm->buff_)[i] = (short)out_data[i]; break;
       default:
         free(out_data);
         free(in_data);
@@ -238,7 +238,7 @@ static double GetNextPhaseAsCurent(double cur_phase, int freq, int sample_rate, 
   return end_phase;
 }
 
-int WTPhysicalPcmEncode(WTFreqCodeType code, void * pcm_buf, int pcm_len, RefPhaseInfo *ref_phase, int sample_bit, int sample_rate)
+int WTPhysicalPcmEncode(WTFreqCodeType code, WTSendPcmBuffType *pcm, RefPhaseInfo *ref_phase)
 {
   FreqEncodeInfo freq_code_info;
   freq_code_info.freq_num_ = 0;
@@ -257,14 +257,14 @@ int WTPhysicalPcmEncode(WTFreqCodeType code, void * pcm_buf, int pcm_len, RefPha
         freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_ = compare_freq_list_[i].left_freq_;
         freq_code_info.freq_and_phase_[freq_code_info.freq_num_].phase_ = ref_phase->left_phase_[i];
         ref_phase->left_phase_[i] = GetNextPhaseAsCurent(freq_code_info.freq_and_phase_[freq_code_info.freq_num_].phase_,
-          freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_, sample_rate, pcm_len / (sample_bit / 8));
+          freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_, pcm->sample_rate_, pcm->buff_len_ / (pcm->sample_bit_ / 8));
         ref_phase->right_phase_[i] = 0.0;
       }
       else {
         freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_ = compare_freq_list_[i].right_freq_;
         freq_code_info.freq_and_phase_[freq_code_info.freq_num_].phase_ = ref_phase->right_phase_[i];
         ref_phase->right_phase_[i] = GetNextPhaseAsCurent(freq_code_info.freq_and_phase_[freq_code_info.freq_num_].phase_,
-          freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_, sample_rate, pcm_len / (sample_bit / 8));
+          freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_, pcm->sample_rate_, pcm->buff_len_ / (pcm->sample_bit_ / 8));
         ref_phase->left_phase_[i] = 0.0;
       }
     }
@@ -273,20 +273,20 @@ int WTPhysicalPcmEncode(WTFreqCodeType code, void * pcm_buf, int pcm_len, RefPha
         freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_ = compare_freq_list_[i].left_freq_;
         freq_code_info.freq_and_phase_[freq_code_info.freq_num_].phase_ = ref_phase->left_phase_[i];
         ref_phase->left_phase_[i] = GetNextPhaseAsCurent(freq_code_info.freq_and_phase_[freq_code_info.freq_num_].phase_,
-          freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_, sample_rate, pcm_len / (sample_bit / 8));
+          freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_, pcm->sample_rate_, pcm->buff_len_ / (pcm->sample_bit_ / 8));
         ref_phase->right_phase_[i] = 0.0;
       }
       else {
         freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_ = compare_freq_list_[i].right_freq_;
         freq_code_info.freq_and_phase_[freq_code_info.freq_num_].phase_ = ref_phase->right_phase_[i];
         ref_phase->right_phase_[i] = GetNextPhaseAsCurent(freq_code_info.freq_and_phase_[freq_code_info.freq_num_].phase_,
-          freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_, sample_rate, pcm_len / (sample_bit / 8));
+          freq_code_info.freq_and_phase_[freq_code_info.freq_num_].freq_, pcm->sample_rate_, pcm->buff_len_ / (pcm->sample_bit_ / 8));
         ref_phase->left_phase_[i] = 0.0;
       }
     }
     freq_code_info.freq_num_++;
   }
-  if (EncodeSoundMixingForFreqCode(&freq_code_info, pcm_buf, pcm_len, sample_bit, sample_rate) != 0) {
+  if (EncodeSoundMixingForFreqCode(&freq_code_info, pcm) != 0) {
     return -1;
   }
   return 0;

@@ -10,7 +10,9 @@
 #include "transceiver/send/wt_send_link_layer.h"
 #include "transceiver/send/wt_send_physical_layer.h"
 #include "proto_utils/wt_proto_common.h"
+#include "proto_utils/wt_proto_physical_layer.h"
 #include "audio_codec/pcm_to_wav.h"
+#include "audio_codec/audio_fix_code.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -131,8 +133,9 @@ WaveTransWavInfo * GetWav(WaveTransSendHander * hander, const void * context, in
     WTSendLinkLayerReleasePackage(hander_data->link_hander_);
     return NULL;
   }
-  int none_len = AUDIO_NONE_LEN(pcm_type->sample_rate_)*(pcm_type->sample_bit_ / 8);
-  int out_pcm_len = 2 * none_len + pcm_type->buff_len_;
+  int prefix_len = AUDIO_PREFIX_LEN(pcm_type->sample_rate_)*(pcm_type->sample_bit_ / 8);
+  int suffix_len = AUDIO_SUFFIX_LEN(pcm_type->sample_rate_)*(pcm_type->sample_bit_ / 8);
+  int out_pcm_len = prefix_len + pcm_type->buff_len_ + suffix_len;
   WTSendPcmBuffType temp_pcm_type;
   temp_pcm_type.buff_ = malloc(out_pcm_len);
   if (temp_pcm_type.buff_ == NULL) {
@@ -143,9 +146,16 @@ WaveTransWavInfo * GetWav(WaveTransSendHander * hander, const void * context, in
   temp_pcm_type.buff_len_ = out_pcm_len;
   temp_pcm_type.sample_bit_ = pcm_type->sample_bit_;
   temp_pcm_type.sample_rate_ = pcm_type->sample_rate_;
-  memset(temp_pcm_type.buff_, 0, none_len);
-  memcpy(((unsigned char *)temp_pcm_type.buff_ + none_len), pcm_type->buff_, pcm_type->buff_len_);
-  memset(((unsigned char *)temp_pcm_type.buff_ + none_len + pcm_type->buff_len_), 0, none_len);
+  WTSendPcmBuffType fix_pcm;
+  fix_pcm.sample_bit_ = pcm_type->sample_bit_;
+  fix_pcm.sample_rate_ = pcm_type->sample_rate_;
+  fix_pcm.buff_ = temp_pcm_type.buff_;
+  fix_pcm.buff_len_ = prefix_len;
+  WTAudioPrefixEncode(&fix_pcm);
+  memcpy(((unsigned char *)temp_pcm_type.buff_ + prefix_len), pcm_type->buff_, pcm_type->buff_len_);
+  fix_pcm.buff_ = (unsigned char *)temp_pcm_type.buff_ + prefix_len + pcm_type->buff_len_;
+  fix_pcm.buff_len_ = suffix_len;
+  WTAudioSuffixEncode(&fix_pcm);
   WTSendPhyLayerReleasePcm(hander_data->phy_hander_);
   WTSendLinkLayerReleasePackage(hander_data->link_hander_);
 

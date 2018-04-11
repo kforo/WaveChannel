@@ -73,11 +73,15 @@ WTSendPcmBuffType * WTSendPhyLayerGetPcm(WTSendPhyHander * hander, WTSendLinkPac
   int pcm_w_addr = 0;
   int i, j;
   int one_freq_pcm_size = WTGetPcmSize(1, hander_data->sample_rate_)*(hander_data->sample_bit_ / 8);
+  WTSendPcmBuffType pcm_type;
+  pcm_type.sample_bit_ = hander_data->sample_bit_;
+  pcm_type.sample_rate_ = hander_data->sample_rate_;
   for (i = 0; i < packages->package_num_; i++) {
     WTLinkFreqCodeReadFromPhyPackage(&packages->package_[i], temp, temp_len);
     for (j = temp_len-1; j >= 0; j--) {
-      WTPhysicalPcmEncode(temp[j], (unsigned char *)hander_data->pcm_info_.buff_ + pcm_w_addr,
-        one_freq_pcm_size, &ref_phase, hander_data->sample_bit_, hander_data->sample_rate_);
+      pcm_type.buff_ = (unsigned char *)hander_data->pcm_info_.buff_ + pcm_w_addr;
+      pcm_type.buff_len_ = one_freq_pcm_size;
+      WTPhysicalPcmEncode(temp[j], &pcm_type, &ref_phase);
       pcm_w_addr += one_freq_pcm_size;
     }
   }

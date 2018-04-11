@@ -31,7 +31,7 @@ int WTPhyAnalysisNumToRealNum(int ana_num);
 
 int WTPhysicalPcmDecode(const RecvAudioType *pcm_buf, int pcm_len, WTFreqCodeType *code);
 
-int WTPhysicalPcmEncode(WTFreqCodeType code, void *pcm_buf, int pcm_len, RefPhaseInfo *ref_phase, int sample_bit, int sample_rate);
+int WTPhysicalPcmEncode(WTFreqCodeType code, WTSendPcmBuffType *pcm, RefPhaseInfo *ref_phase);
 
 
 
