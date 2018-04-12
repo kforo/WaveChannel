@@ -1,4 +1,4 @@
-set GYP_TOOLS=D:\ipc\workspace\gyp\gyp
+set GYP_TOOLS=%1
 set GYP_DEFINES=OS=win
 
 
