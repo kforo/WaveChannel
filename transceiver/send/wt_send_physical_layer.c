@@ -67,9 +67,9 @@ WTSendPcmBuffType * WTSendPhyLayerGetPcm(WTSendPhyHander * hander, WTSendLinkPac
   WTFreqCodeType temp[COMPARE_FREQ_DATA_BIT];
   int temp_len = COMPARE_FREQ_DATA_BIT;
   RefPhaseInfo ref_phase;
-  ref_phase.bit_num_ = COMPARE_FREQ_BIT;
-  memset(&ref_phase.left_phase_, 0, sizeof(double)*COMPARE_FREQ_BIT);
-  memset(&ref_phase.right_phase_, 0, sizeof(double)*COMPARE_FREQ_BIT);
+  ref_phase.bit_num_ = COMPARE_FREQ_BIT + COMPARE_FREQ_PARITY_BIT;
+  memset(&ref_phase.left_phase_, 0, sizeof(double)*ref_phase.bit_num_);
+  memset(&ref_phase.right_phase_, 0, sizeof(double)*ref_phase.bit_num_);
   int pcm_w_addr = 0;
   int i, j;
   int one_freq_pcm_size = WTGetPcmSize(1, hander_data->sample_rate_)*(hander_data->sample_bit_ / 8);
