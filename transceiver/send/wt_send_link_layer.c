@@ -1,10 +1,9 @@
 /*
 #
-# Copyright 2018, sohu ipc
 # author: ChenFawang
 # main.cc
 # 2018-01-26
-# mail: fawangchen@sohu-inc.com
+# mail: cfwang_9984@163.com
 */
 #include "wt_send_link_layer.h"
 #include "buff_utils/ring_buff.h"

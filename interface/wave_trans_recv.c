@@ -1,10 +1,9 @@
 /*
 #
-# Copyright 2018, sohu ipc
 # author: ChenFawang
 # main.cc
 # 2018-01-26
-# mail: fawangchen@sohu-inc.com
+# mail: cfwang_9984@163.com
 */
 #include "wave_trans_recv.h"
 #include "transceiver/recv/wt_recv_link_layer.h"

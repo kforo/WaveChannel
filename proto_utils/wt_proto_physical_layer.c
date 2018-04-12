@@ -1,10 +1,9 @@
 /*
 #
-# Copyright 2018, sohu ipc
 # author: ChenFawang
 # main.cc
 # 2018-01-26
-# mail: fawangchen@sohu-inc.com
+# mail: cfwang_9984@163.com
 */
 #include "wt_proto_physical_layer.h"
 #include "kiss_fft/kiss_fft.h"
