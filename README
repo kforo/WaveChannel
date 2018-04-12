@@ -10,7 +10,7 @@
   8.硬件要求：目前发送端支持16000以上的采样率，接收端采样率只支持16000Hz，采样精度16bit，要求speaker和mic都不能破音。
   9.传输声音频率范围：1375~7250Hz。
   
-  
+  提供一个GYP工具下载地址（不保证一直有效）：https://download.csdn.net/download/yb4141/9453028
   编译方法：
   WINDOWS VS2015:
     1.安装python。
