@@ -9,6 +9,7 @@ Makefile
 *.mk
 *.Makefile
 *.pcm
+*.wav
 /Default/
 /Debug/
 /.vs/
